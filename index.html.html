@@ -1,0 +1,2406 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loopus 強み・スタイル診断</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Zen Maru Gothic & Noto Sans JP -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Zen Maru Gothic"', '"Noto Sans JP"', 'sans-serif'],
+            maru: ['"Zen Maru Gothic"', 'sans-serif'],
+          },
+          boxShadow: {
+            'soft': '0 8px 30px -4px rgba(15, 23, 42, 0.06)',
+            'card': '0 2px 12px -2px rgba(15, 23, 42, 0.05)',
+            'pop': '0 10px 25px -5px rgba(249, 115, 22, 0.18)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+    body {
+      font-family: 'Zen Maru Gothic', 'Noto Sans JP', sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.92); }
+      60% { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+    .animate-fade-in {
+      animation: fadeIn 0.28s ease-out forwards;
+    }
+    .animate-pop {
+      animation: popIn 0.22s ease-out forwards;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-50/90 text-slate-800 antialiased selection:bg-orange-100 selection:text-orange-900">
+
+  <!-- =========================================================
+       ヘッダー＆4つのメインナビゲーション
+  ========================================================== -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between py-3 gap-2.5">
+        <!-- ブランドロゴ -->
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3 cursor-pointer group" onclick="switchTab('test')">
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-orange-500 via-amber-500 to-violet-500 text-white flex items-center justify-center font-black text-xl shadow-sm group-hover:scale-105 transition-transform">
+              L
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h1 class="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+                  Loopus 強み・スタイル診断
+                </h1>
+              </div>
+              <p class="text-[11px] sm:text-xs text-slate-500 font-medium">
+                自分の「得意な動き方」を見つけて、チームをもっと楽しく！
+              </p>
+            </div>
+          </div>
+          <!-- モバイル用ステータスバッジ -->
+          <span id="mobile-status-badge" class="md:hidden inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-600">
+            まだ診断前
+          </span>
+        </div>
+
+        <!-- 4つのメインタブ -->
+        <nav aria-label="メニュー" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5 md:pb-0">
+          <button id="tab-btn-test" onclick="switchTab('test')"
+            class="tab-btn flex-shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs sm:text-sm font-bold transition-all cursor-pointer">
+            <span>✨ 診断する</span>
+          </button>
+
+          <button id="tab-btn-report" onclick="switchTab('report')"
+            class="tab-btn flex-shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs sm:text-sm font-bold transition-all cursor-pointer">
+            <span>📊 マイ結果</span>
+            <span id="report-ready-dot" class="hidden w-2 h-2 rounded-full bg-emerald-500"></span>
+          </button>
+
+          <button id="tab-btn-team" onclick="switchTab('team')"
+            class="tab-btn flex-shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs sm:text-sm font-bold transition-all cursor-pointer">
+            <span>🤝 10人マップ</span>
+          </button>
+
+          <button id="tab-btn-encyclopedia" onclick="switchTab('encyclopedia')"
+            class="tab-btn flex-shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs sm:text-sm font-bold transition-all cursor-pointer">
+            <span>📖 16強み図鑑</span>
+          </button>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================
+       メインコンテンツ領域
+  ========================================================== -->
+  <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8">
+
+    <!-- -------------------------------------------------------
+         VIEW 1: 診断する（ウェルカム画面 ＆ 回答画面）
+    -------------------------------------------------------- -->
+    <section id="view-test" class="animate-fade-in">
+
+      <!-- ① ウェルカム画面（診断トップ） -->
+      <div id="test-welcome-screen" class="max-w-3xl mx-auto space-y-6">
+        <div class="bg-white rounded-3xl border border-slate-200/80 shadow-soft p-6 sm:p-10 text-center relative overflow-hidden">
+          <!-- 背景のやさしい装飾丸 -->
+          <div class="w-40 h-40 rounded-full bg-orange-100/60 blur-2xl absolute -top-12 -left-12 pointer-events-none"></div>
+          <div class="w-40 h-40 rounded-full bg-violet-100/60 blur-2xl absolute -bottom-12 -right-12 pointer-events-none"></div>
+
+          <div class="relative z-10 space-y-4">
+            <div class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-orange-50 text-orange-600 border border-orange-200/80 text-xs font-extrabold">
+              <span>🎉 Loopusメンバー専用</span>
+              <span>•</span>
+              <span>16タイプの強み診断</span>
+            </div>
+
+            <h2 class="text-2xl sm:text-3xl font-black text-slate-900 leading-snug">
+              能力テストじゃないよ！<br class="sm:hidden">自分の<span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-violet-600">「得意なスタイル」</span>を見つけよう✨
+            </h2>
+
+            <p class="text-sm sm:text-base text-slate-600 max-w-xl mx-auto leading-relaxed">
+              この診断は「誰がすごいか」を決めるテストではなく、<strong>一人ひとりが自然にワクワク動ける得意パターン</strong>を見つけて、Loopusの活動をもっと楽しく・スムーズにするためのツールだよ！<br>
+              「こうあるべき」じゃなく、<strong>「普段の自分っぽいな〜」</strong>と思う方を直感で選んでね。
+            </p>
+
+            <!-- ニックネーム＆担当入力エリア -->
+            <div class="max-w-lg mx-auto pt-3 text-left grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label for="user-name-input" class="block text-xs font-bold text-slate-700 mb-1.5">
+                  ニックネーム（未入力なら「あなた」になるよ）
+                </label>
+                <input type="text" id="user-name-input" placeholder="例：ハルト / あおい"
+                  oninput="handleProfileInput()"
+                  class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50/70 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 text-sm font-bold transition-all">
+              </div>
+              <div>
+                <label for="user-role-input" class="block text-xs font-bold text-slate-700 mb-1.5">
+                  いま関わっていること（任意）
+                </label>
+                <input type="text" id="user-role-input" placeholder="例：イベント企画・SNS・渉外など"
+                  oninput="handleProfileInput()"
+                  class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50/70 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 text-sm font-bold transition-all">
+              </div>
+            </div>
+
+            <!-- コース選択カード -->
+            <div class="pt-4">
+              <p class="text-xs font-extrabold text-slate-500 mb-3">
+                👇 好きなコースを選んでスタート！（結果はどちらも同じ基準で見られるよ）
+              </p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
+                <!-- サクッと32問コース -->
+                <button type="button" onclick="startQuiz(32)"
+                  class="group relative p-5 sm:p-6 rounded-3xl border-2 border-orange-200 bg-gradient-to-br from-orange-50/90 to-amber-50/60 hover:border-orange-500 hover:shadow-pop transition-all cursor-pointer flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center justify-between gap-2 mb-2">
+                      <span class="px-2.5 py-1 rounded-xl bg-orange-500 text-white text-xs font-black">
+                        ⚡ おすすめ・約3分
+                      </span>
+                      <span class="text-xs font-extrabold text-orange-700">全8ページ（4問ずつ）</span>
+                    </div>
+                    <h3 class="text-lg sm:text-xl font-black text-slate-900 group-hover:text-orange-600 transition-colors">
+                      サクッと32問コース
+                    </h3>
+                    <p class="text-xs sm:text-sm text-slate-600 mt-1.5 leading-relaxed">
+                      16の強みを2問ずつチェック！スキマ時間にテンポよく自分のタイプを知りたい人向け。
+                    </p>
+                  </div>
+                  <div class="mt-4 pt-3 border-t border-orange-200/60 flex items-center justify-between text-xs font-black text-orange-600">
+                    <span>このコースで始める</span>
+                    <span class="group-hover:translate-x-1 transition-transform">→</span>
+                  </div>
+                </button>
+
+                <!-- じっくり64問フルコース -->
+                <button type="button" onclick="startQuiz(64)"
+                  class="group relative p-5 sm:p-6 rounded-3xl border-2 border-violet-200 bg-gradient-to-br from-violet-50/90 to-indigo-50/60 hover:border-violet-500 hover:shadow-soft transition-all cursor-pointer flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center justify-between gap-2 mb-2">
+                      <span class="px-2.5 py-1 rounded-xl bg-violet-600 text-white text-xs font-black">
+                        🎯 精密版・約6分
+                      </span>
+                      <span class="text-xs font-extrabold text-violet-700">全16ページ（4問ずつ）</span>
+                    </div>
+                    <h3 class="text-lg sm:text-xl font-black text-slate-900 group-hover:text-violet-600 transition-colors">
+                      じっくり64問フルコース
+                    </h3>
+                    <p class="text-xs sm:text-sm text-slate-600 mt-1.5 leading-relaxed">
+                      16の強みを4問ずつしっかりチェック！迷いやすい強みの違いまでバッチリ出し切りたい人向け。
+                    </p>
+                  </div>
+                  <div class="mt-4 pt-3 border-t border-violet-200/60 flex items-center justify-between text-xs font-black text-violet-600">
+                    <span>このコースで始める</span>
+                    <span class="group-hover:translate-x-1 transition-transform">→</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <!-- 控えめなデモ体験用リンク -->
+            <div class="pt-3 flex flex-wrap items-center justify-center gap-4">
+              <button type="button" onclick="runDemoSample()"
+                class="text-xs font-bold text-slate-400 hover:text-slate-600 underline underline-offset-4 transition-colors cursor-pointer">
+                🎲 おためし自動入力（ランダム回答で結果を見る）
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4つのグループ紹介ミニカード -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div class="bg-[#FFF7ED] border border-orange-200/80 rounded-2xl p-3.5 text-center">
+            <div class="text-lg mb-1">🔥</div>
+            <div class="text-xs font-black text-orange-700">ゼロから動かす・外に広げる力</div>
+            <div class="text-[11px] text-orange-900/70 mt-0.5">ゼロイチ開拓・発信・交渉・実行</div>
+          </div>
+          <div class="bg-[#EEF2FF] border border-indigo-200/80 rounded-2xl p-3.5 text-center">
+            <div class="text-lg mb-1">🛠️</div>
+            <div class="text-xs font-black text-indigo-700">形にする・現場を支える力</div>
+            <div class="text-[11px] text-indigo-900/70 mt-0.5">現場回し・段取り・会計・仕上げ</div>
+          </div>
+          <div class="bg-[#ECFDF5] border border-emerald-200/80 rounded-2xl p-3.5 text-center">
+            <div class="text-lg mb-1">💬</div>
+            <div class="text-xs font-black text-emerald-700">チームをつなぐ・空気をつくる力</div>
+            <div class="text-[11px] text-emerald-900/70 mt-0.5">安心感・盛り上げ・調整・引き継ぎ</div>
+          </div>
+          <div class="bg-[#F5F3FF] border border-violet-200/80 rounded-2xl p-3.5 text-center">
+            <div class="text-lg mb-1">🧭</div>
+            <div class="text-xs font-black text-violet-700">先を読む・仕組みを整える力</div>
+            <div class="text-[11px] text-violet-900/70 mt-0.5">流行察知・仕組み化・先回り・軸</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ② 診断回答画面（16Personalities風の丸型サークルUI） -->
+      <div id="test-quiz-screen" class="hidden max-w-3xl mx-auto space-y-5">
+        <!-- 上部ナビ＆進捗バー -->
+        <div class="bg-white/95 backdrop-blur-md rounded-3xl border border-slate-200/80 shadow-card p-4 sm:p-5 sticky top-[72px] md:top-[64px] z-30">
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="backToWelcome()"
+                class="text-xs font-bold text-slate-400 hover:text-slate-700 px-2 py-1 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
+                ← コース選択へ
+              </button>
+              <span id="step-indicator-badge" class="px-2.5 py-0.5 rounded-full bg-orange-500 text-white text-xs font-black">
+                1 / 8 ページ
+              </span>
+            </div>
+            <div id="cheer-message-label" class="text-xs sm:text-sm font-black text-orange-600">
+              あと 32 問！直感でいこう✨
+            </div>
+          </div>
+
+          <!-- プログレスバー -->
+          <div class="flex items-center gap-3">
+            <div class="flex-1 h-3 bg-slate-100 rounded-full overflow-hidden">
+              <div id="progress-bar-fill" class="h-full bg-gradient-to-r from-orange-400 via-amber-500 to-emerald-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <span class="text-xs font-black text-slate-600 whitespace-nowrap">
+              <span id="answered-count-label" class="text-orange-600">0</span> / <span id="total-count-label">32</span>問
+            </span>
+          </div>
+        </div>
+
+        <!-- 質問カード一覧（4問ずつ表示） -->
+        <div id="questions-container" class="space-y-4">
+          <!-- JSで動的生成 -->
+        </div>
+
+        <!-- ページ送りボタン -->
+        <div class="bg-white rounded-3xl border border-slate-200/80 shadow-soft p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3">
+          <button type="button" id="prev-step-btn" onclick="prevStep()"
+            class="px-5 py-3 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-extrabold transition-all disabled:opacity-35 disabled:pointer-events-none cursor-pointer">
+            ← 前のページ
+          </button>
+
+          <div class="flex items-center gap-3">
+            <button type="button" onclick="resetCurrentAnswers()"
+              class="text-xs font-bold text-slate-400 hover:text-rose-500 transition-colors cursor-pointer">
+              やり直す
+            </button>
+            <span class="text-slate-200">|</span>
+            <button type="button" onclick="runDemoSample()"
+              class="text-xs font-bold text-slate-400 hover:text-violet-600 transition-colors cursor-pointer">
+              🎲 おためし自動入力
+            </button>
+          </div>
+
+          <button type="button" id="next-step-btn" onclick="nextStep()"
+            class="px-6 py-3 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-xs sm:text-sm font-black shadow-sm transition-all cursor-pointer">
+            <span id="next-step-btn-text">次のページへ →</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- -------------------------------------------------------
+         VIEW 2: マイ結果（個人結果レポート）
+    -------------------------------------------------------- -->
+    <section id="view-report" class="hidden animate-fade-in space-y-6">
+      <!-- 未診断時の案内 -->
+      <div id="report-empty-state" class="bg-white rounded-3xl border border-slate-200/80 shadow-soft p-8 sm:p-12 text-center max-w-2xl mx-auto">
+        <div class="text-4xl mb-3">🔍</div>
+        <h2 class="text-xl font-black text-slate-900 mb-2">まだ診断結果がないよ！</h2>
+        <p class="text-sm text-slate-600 mb-6 leading-relaxed">
+          「サクッと32問コース（約3分）」または「じっくり64問フルコース（約6分）」に答えると、あなただけの<strong>マイ強みカード（Top 4）</strong>が見られるよ！
+        </p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <button type="button" onclick="switchTab('test')"
+            class="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white text-sm font-black shadow-sm transition-all cursor-pointer">
+            診断をスタートする ✨
+          </button>
+          <button type="button" onclick="runDemoSample()"
+            class="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold transition-all cursor-pointer">
+            サンプル結果を見てみる
+          </button>
+        </div>
+      </div>
+
+      <!-- 診断結果コンテンツ -->
+      <div id="report-content" class="hidden space-y-6">
+
+        <!-- ① スマホでスクショしてLINEに貼れる「マイ強みカード（Top 4）」 -->
+        <div class="bg-white rounded-3xl border border-slate-200/80 shadow-soft overflow-hidden">
+          <!-- 華やかなトップバナー -->
+          <div id="report-card-banner" class="bg-gradient-to-r from-orange-500 via-amber-500 to-violet-600 p-5 sm:p-7 text-white">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+              <span id="report-dominant-type-badge" class="px-3 py-1 rounded-full bg-white/20 backdrop-blur-xs text-xs font-extrabold">
+                🔥 ゼロから動かす・外に広げる力
+              </span>
+              <span id="report-course-badge" class="text-xs font-bold text-white/90">
+                サクッと32問コース
+              </span>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-black tracking-tight">
+              <span id="report-user-name">あなた</span> の強み TOP 4
+            </h2>
+            <p id="report-catchphrase" class="text-sm sm:text-base font-black text-amber-100 mt-1.5">
+              ✨ 「まずやってみよう！」で周りを巻き込むアイデア突破タイプ
+            </p>
+            <p id="report-user-role" class="text-xs text-white/85 mt-1 font-medium"></p>
+          </div>
+
+          <!-- Top 4 バッジグリッド（スクショ映えエリア） -->
+          <div class="p-5 sm:p-7">
+            <div id="report-top4-pills" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+              <!-- JSで生成 -->
+            </div>
+
+            <!-- シェア＆10人マップ追加ボタン -->
+            <div class="mt-6 pt-5 border-t border-slate-100 flex flex-wrap items-center gap-2.5">
+              <button type="button" onclick="copyShareText()"
+                class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-black shadow-sm transition-all cursor-pointer">
+                <span>📋 LINE / Slackで結果をシェアする</span>
+              </button>
+
+              <button type="button" onclick="addCurrentResultToTeam()"
+                class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white text-xs sm:text-sm font-black shadow-sm transition-all cursor-pointer">
+                <span>🤝 10人マップに自分を追加する</span>
+              </button>
+
+              <button type="button" onclick="copyShareCode()"
+                class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all cursor-pointer">
+                <span>🔗 合体用コードをコピー</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ② TOP 4 強みの詳しいトリセツ（タブ切り替え ＆ 一覧表示切替） -->
+        <div class="bg-white rounded-3xl border border-slate-200/80 shadow-soft p-5 sm:p-7 space-y-5">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <h3 class="text-lg sm:text-xl font-black text-slate-900">
+                📖 あなたのTOP 4 強みのトリセツ
+              </h3>
+              <p class="text-xs text-slate-500 mt-0.5">
+                強みの活かし方と「やりすぎ注意ポイント」をチェックしてみよう！
+              </p>
+            </div>
+            <!-- 表示モード切替 -->
+            <div class="inline-flex rounded-2xl bg-slate-100 p-1 self-start">
+              <button type="button" id="detail-mode-tab-btn" onclick="setReportDetailMode('tab')"
+                class="px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer">
+                1つずつ見る
+              </button>
+              <button type="button" id="detail-mode-all-btn" onclick="setReportDetailMode('all')"
+                class="px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer">
+                4つ全部並べる
+              </button>
+            </div>
+          </div>
+
+          <!-- TOP 4 選択タブバー（「1つずつ見る」モード時に表示） -->
+          <div id="top4-detail-tabs" class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <!-- JSで生成 -->
+          </div>
+
+          <!-- TOP 4 詳細カード表示エリア -->
+          <div id="report-top4-cards" class="space-y-4">
+            <!-- JSで生成 -->
+          </div>
+        </div>
+
+        <!-- ③ 4タイプのバランスチャート ＆ 全16強みランキング -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <!-- 左：4タイプバランス -->
+          <div class="lg:col-span-5 bg-white rounded-3xl border border-slate-200/80 shadow-soft p-5 sm:p-6 flex flex-col justify-between">
+            <div>
+              <h3 class="text-base sm:text-lg font-black text-slate-900 mb-1">🎨 4タイプのバランス</h3>
+              <p class="text-xs text-slate-500 mb-4">どのタイプのエネルギーが強いかひと目でわかるよ</p>
+              <div id="radar-chart-container" class="w-full flex items-center justify-center my-2">
+                <!-- JSでSVG生成 -->
+              </div>
+            </div>
+            <div id="domain-bars-container" class="space-y-3 mt-4 pt-4 border-t border-slate-100">
+              <!-- JSで生成 -->
+            </div>
+          </div>
+
+          <!-- 右：全16強みスコア一覧 -->
+          <div class="lg:col-span-7 bg-white rounded-3xl border border-slate-200/80 shadow-soft p-5 sm:p-6">
+            <div class="flex items-center justify-between mb-1">
+              <h3 class="text-base sm:text-lg font-black text-slate-900">🏆 全16強み ランキング</h3>
+              <span class="text-xs text-slate-400 font-bold">タップで解説を見る</span>
+            </div>
+            <p class="text-xs text-slate-500 mb-4">
+              上位4つがあなたの武器！下位の項目は、得意な仲間にどんどん頼っちゃおう 🙌
+            </p>
+            <div id="full-ranking-container" class="space-y-2">
+              <!-- JSで生成 -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- -------------------------------------------------------
+         VIEW 3: 10人マップ（チーム分析）
+    -------------------------------------------------------- -->
+    <section id="view-team" class="hidden animate-fade-in space-y-6">
+      <!-- ヘッダー＆操作バー -->
+      <div class="bg-white rounded-3xl border border-slate-200/80 shadow-soft p-5 sm:p-7">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2 mb-1.5">
+              <span class="px-3 py-0.5 rounded-full text-xs font-extrabold bg-sky-50 text-sky-700 border border-sky-200">
+                🤝 Loopus チーム全体マップ
+              </span>
+              <span id="team-count-badge" class="px-3 py-0.5 rounded-full text-xs font-black bg-slate-900 text-white">
+                いま 10 人
+              </span>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-black text-slate-900">
+              Loopus 10人マップ＆役割フィットボード
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-600 mt-1">
+              みんなの強みを重ね合わせて、「今のLoopusの得意なこと」や「新しい仕事（資金調達・ボランティア運営・経理など）を誰にお願いすると良さそうか」を見てみよう！
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" onclick="openImportModal()"
+              class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-black shadow-sm transition-all cursor-pointer">
+              <span>＋ 仲間のコードを追加</span>
+            </button>
+
+            <button type="button" onclick="loadPresetTeam(true)"
+              class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all cursor-pointer">
+              <span>🔄 初期10人データに戻す</span>
+            </button>
+
+            <button type="button" onclick="confirmClearTeam()"
+              class="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-2xl bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-500 text-xs font-bold transition-all cursor-pointer">
+              <span>全員クリア</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ① これからのLoopus 役割フィットボード（誰がどの活動にハマりそう？） -->
+      <div class="bg-white rounded-3xl border border-slate-200/80 shadow-soft p-5 sm:p-7 space-y-4">
+        <div>
+          <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-violet-50 text-violet-700 border border-violet-200 mb-1">
+            🌟 新しい役割分担のヒント
+          </span>
+          <h3 class="text-lg sm:text-xl font-black text-slate-900">
+            活動テーマ別「ピッタリなメンバー」ボード
+          </h3>
+          <p class="text-xs text-slate-500 mt-0.5">
+            イベントやSNSはもちろん、これから増える「資金調達・ボランティア運営・経理」に相性がいいメンバーを自動ピックアップ！
+          </p>
+        </div>
+
+        <div id="role-fit-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+          <!-- JSで6テーマのフィットカードを生成 -->
+        </div>
+      </div>
+
+      <!-- ② 4タイプ分布 ＆ 16強み人数マップ -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- 左：4タイプ割合 -->
+        <div class="lg:col-span-5 bg-white rounded-3xl border border-slate-200/80 shadow-soft p-5 sm:p-6">
+          <h3 class="text-base sm:text-lg font-black text-slate-900 mb-1">📊 チームの4タイプ割合</h3>
+          <p class="text-xs text-slate-500 mb-4">全員のTop 4枠がどのタイプに集まっているか</p>
+          <div id="team-domain-distribution" class="space-y-3.5">
+            <!-- JSで生成 -->
+          </div>
+          <div id="team-balance-tip" class="mt-4 p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70 text-xs text-slate-700 leading-relaxed">
+            <!-- JSでアドバイス生成 -->
+          </div>
+        </div>
+
+        <!-- 右：16強み別 保有者ヒートマップ -->
+        <div class="lg:col-span-7 bg-white rounded-3xl border border-slate-200/80 shadow-soft p-5 sm:p-6">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+            <h3 class="text-base sm:text-lg font-black text-slate-900">🗺️ 16強み別 メンバー分布</h3>
+            <div class="flex items-center gap-2 text-[11px] text-slate-500 font-bold">
+              <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-rose-200"></span>0人（手薄）</span>
+              <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>1〜2人</span>
+              <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-orange-500"></span>3人以上</span>
+            </div>
+          </div>
+          <p class="text-xs text-slate-500 mb-4">強みをタップすると詳しいトリセツが見られるよ</p>
+          <div id="team-heatmap-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <!-- JSで16マス生成 -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ③ メンバー別 TOP 4 一覧表 -->
+      <div class="bg-white rounded-3xl border border-slate-200/80 shadow-soft overflow-hidden">
+        <div class="p-5 sm:p-6 border-b border-slate-100">
+          <h3 class="text-base sm:text-lg font-black text-slate-900">👥 メンバー別 TOP 4 一覧</h3>
+          <p class="text-xs text-slate-500 mt-0.5">名前をタップすると、そのメンバーの「マイ結果」画面を開けるよ！</p>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200/80 text-[11px] font-extrabold text-slate-500">
+                <th class="py-3.5 px-4 sm:px-6">メンバー / 担当</th>
+                <th class="py-3.5 px-3">メインタイプ</th>
+                <th class="py-3.5 px-3">TOP 1</th>
+                <th class="py-3.5 px-3">TOP 2</th>
+                <th class="py-3.5 px-3">TOP 3</th>
+                <th class="py-3.5 px-3">TOP 4</th>
+                <th class="py-3.5 px-4 text-right">削除</th>
+              </tr>
+            </thead>
+            <tbody id="team-roster-tbody" class="divide-y divide-slate-100 text-sm">
+              <!-- JSで生成 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- -------------------------------------------------------
+         VIEW 4: 16強み図鑑
+    -------------------------------------------------------- -->
+    <section id="view-encyclopedia" class="hidden animate-fade-in space-y-6">
+      <div class="bg-white rounded-3xl border border-slate-200/80 shadow-soft p-5 sm:p-7">
+        <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+          <div>
+            <span class="inline-block px-3 py-0.5 rounded-full text-xs font-extrabold bg-orange-50 text-orange-600 border border-orange-200 mb-2">
+              📖 いつでも見返せる共通ガイド
+            </span>
+            <h2 class="text-xl sm:text-2xl font-black text-slate-900">
+              Loopus 16強み図鑑
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-600 mt-1">
+              ミーティングや役割分担の相談をするときに、みんなの強みや「やりすぎ注意ポイント」をサクッとチェックできるよ！
+            </p>
+          </div>
+
+          <!-- 検索バー -->
+          <div class="w-full lg:w-72">
+            <div class="relative">
+              <input type="text" id="encyclopedia-search" placeholder="強み名・SNS・会計などで検索..."
+                oninput="renderEncyclopedia()"
+                class="w-full pl-9 pr-4 py-2.5 rounded-2xl border border-slate-200 bg-slate-50/70 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-400 text-xs sm:text-sm font-medium">
+              <span class="absolute left-3 top-2.5 text-slate-400 text-sm">🔍</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4タイプフィルター -->
+        <div id="encyclopedia-filters" class="flex flex-wrap items-center gap-2 mt-5 pt-4 border-t border-slate-100">
+          <!-- JSで生成 -->
+        </div>
+      </div>
+
+      <!-- 16強みカード一覧 -->
+      <div id="encyclopedia-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <!-- JSで生成 -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =========================================================
+       フッター
+  ========================================================== -->
+  <footer class="bg-white border-t border-slate-200/80 py-6 mt-12">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400 font-medium">
+      <div>✨ Loopus 強み・スタイル診断（全16タイプ）</div>
+      <div>お互いの「得意」を知って、チームで補い合うためのツールです</div>
+    </div>
+  </footer>
+
+  <!-- =========================================================
+       強み詳細モーダル
+  ========================================================== -->
+  <div id="strength-detail-modal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4" onclick="closeModalOnBackdrop(event, 'strength-detail-modal')">
+    <div class="bg-white rounded-3xl max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 p-5 sm:p-7 animate-fade-in">
+      <div class="flex items-start justify-between gap-3 mb-4">
+        <div id="modal-strength-header"></div>
+        <button type="button" onclick="closeModal('strength-detail-modal')" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold flex items-center justify-center cursor-pointer">
+          ✕
+        </button>
+      </div>
+      <div id="modal-strength-body" class="space-y-3 text-sm"></div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       仲間のコード追加モーダル
+  ========================================================== -->
+  <div id="import-code-modal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4" onclick="closeModalOnBackdrop(event, 'import-code-modal')">
+    <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 p-5 sm:p-6 animate-fade-in">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-lg font-black text-slate-900">🔗 仲間の結果コードを追加する</h3>
+        <button type="button" onclick="closeModal('import-code-modal')" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold flex items-center justify-center cursor-pointer">
+          ✕
+        </button>
+      </div>
+      <p class="text-xs text-slate-600 mb-3 leading-relaxed">
+        LINEなどで送ってもらった<strong>「合体用コード（LOOPUS-...）」</strong>を下の枠に貼り付けてね！
+      </p>
+      <textarea id="import-code-textarea" rows="3" placeholder="LOOPUS-V1:..."
+        class="w-full p-3.5 rounded-2xl border border-slate-200 bg-slate-50 text-xs font-mono focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-400 mb-4"></textarea>
+      <div class="flex items-center justify-end gap-2">
+        <button type="button" onclick="closeModal('import-code-modal')" class="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer">
+          キャンセル
+        </button>
+        <button type="button" onclick="importMemberFromCode()" class="px-5 py-2.5 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-black shadow-sm cursor-pointer">
+          10人マップに追加する
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       カスタム確認モーダル（confirm()の代わり）
+  ========================================================== -->
+  <div id="custom-confirm-modal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full shadow-2xl border border-slate-200 p-5 sm:p-6 animate-fade-in">
+      <h3 id="confirm-modal-title" class="text-base font-black text-slate-900 mb-2">確認</h3>
+      <p id="confirm-modal-message" class="text-xs sm:text-sm text-slate-600 mb-5 leading-relaxed"></p>
+      <div class="flex items-center justify-end gap-2">
+        <button type="button" onclick="closeModal('custom-confirm-modal')" class="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer">
+          やめておく
+        </button>
+        <button type="button" id="confirm-modal-ok-btn" class="px-4 py-2.5 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white text-xs font-black shadow-sm cursor-pointer">
+          OK、実行する
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       トースト通知（alert()の代わり）
+  ========================================================== -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none max-w-sm w-[calc(100%-2.5rem)]"></div>
+
+  <!-- =========================================================
+       JavaScript ロジック＆全データ
+  ========================================================== -->
+  <script>
+    /**
+     * 1. 4つのグループ定義
+     * グループ1: オレンジ/コーラル系
+     * グループ2: ブルー/インディゴ系
+     * グループ3: グリーン/エメラルド系
+     * グループ4: パープル/バイオレット系
+     */
+    const DOMAINS = {
+      1: {
+        id: 1,
+        emoji: '🔥',
+        name: 'ゼロから動かす・外に広げる力',
+        shortName: 'ゼロから動かす・外に広げる',
+        hex: '#F97316',
+        lightHex: '#FFF7ED',
+        badgeBg: 'bg-[#FFF7ED]',
+        badgeText: 'text-orange-700',
+        badgeBorder: 'border-orange-200',
+        solidBg: 'bg-[#F97316]',
+        gradBg: 'from-orange-500 via-amber-500 to-rose-500',
+        accentText: 'text-orange-600',
+        borderLeft: 'border-l-[#F97316]'
+      },
+      2: {
+        id: 2,
+        emoji: '🛠️',
+        name: '形にする・現場を支える力',
+        shortName: '形にする・現場を支える',
+        hex: '#4F46E5',
+        lightHex: '#EEF2FF',
+        badgeBg: 'bg-[#EEF2FF]',
+        badgeText: 'text-indigo-700',
+        badgeBorder: 'border-indigo-200',
+        solidBg: 'bg-[#4F46E5]',
+        gradBg: 'from-blue-600 via-indigo-600 to-sky-500',
+        accentText: 'text-indigo-600',
+        borderLeft: 'border-l-[#4F46E5]'
+      },
+      3: {
+        id: 3,
+        emoji: '💬',
+        name: 'チームをつなぐ・空気をつくる力',
+        shortName: 'チームをつなぐ・空気をつくる',
+        hex: '#10B981',
+        lightHex: '#ECFDF5',
+        badgeBg: 'bg-[#ECFDF5]',
+        badgeText: 'text-emerald-700',
+        badgeBorder: 'border-emerald-200',
+        solidBg: 'bg-[#10B981]',
+        gradBg: 'from-emerald-500 via-teal-500 to-cyan-500',
+        accentText: 'text-emerald-600',
+        borderLeft: 'border-l-[#10B981]'
+      },
+      4: {
+        id: 4,
+        emoji: '🧭',
+        name: '先を読む・仕組みを整える力',
+        shortName: '先を読む・仕組みを整える',
+        hex: '#8B5CF6',
+        lightHex: '#F5F3FF',
+        badgeBg: 'bg-[#F5F3FF]',
+        badgeText: 'text-violet-700',
+        badgeBorder: 'border-violet-200',
+        solidBg: 'bg-[#8B5CF6]',
+        gradBg: 'from-violet-600 via-purple-600 to-indigo-500',
+        accentText: 'text-violet-600',
+        borderLeft: 'border-l-[#8B5CF6]'
+      }
+    };
+
+    /**
+     * 2. 全16強みの詳細解説データ（高校生・大学生の日常シーン＆親しみやすい言葉）
+     */
+    const STRENGTHS = [
+      // 【グループ1：ゼロから動かす・外に広げる力】
+      {
+        id: 1,
+        domainId: 1,
+        catchphrase: '「とりあえずやってみない？」で最初の扉を開くアイデアメーカー',
+        name: 'ゼロイチ開拓',
+        desc: '文化祭の出し物やゼミの発表で、まだ何も決まっていないときでも「とりあえずこんな感じでやってみない？」と最初のたたき台を出せる力。',
+        scene: '新しいイベントの企画出し、ゼロからのアイデア会議、誰もやったことがない企画のスタートダッシュ。',
+        goodUse: '話し合いでみんなが迷っているときに「こんな案どう？」と一歩目を踏み出して、一気に空気を前に動かせる！',
+        overuse: '新しいアイデアを次々に思いつく反面、やりっぱなしになって後半の細かい詰めや片付けが雑になっちゃうことも。',
+        recipe: '最初のたたき台を作ったら、早めに「段取りマスター」や「スッキリ仕組み化」が得意な仲間にバトンタッチしてみよう！'
+      },
+      {
+        id: 2,
+        domainId: 1,
+        catchphrase: '「これめっちゃ面白そう！」を引き出す言葉と魅せ方の達人',
+        name: 'ファンづくり発信',
+        desc: 'インスタのストーリーや紹介文をつくるとき、「どう伝えたら相手の心に響くかな？」と考えて、思わず参加したくなる表現に変える力。',
+        scene: 'インスタやTikTokでの広報投稿、イベントの集客チラシ、企業や参加者に魅力を伝えるスライド作り。',
+        goodUse: '内輪だけの言葉じゃなく、初めて見た人が「面白そう！行ってみたい！」とワクワクする見せ方に変えられる！',
+        overuse: 'SNSでの盛り上げや見せ方を頑張りすぎて、実際の運営メンバーの準備キャパを超えてしまうことがあるよ。',
+        recipe: '集客投稿を出す前に、「現場ディレクション」や「先回りリスク対策」の仲間に当日の受け入れ人数を確認しておこう！'
+      },
+      {
+        id: 3,
+        domainId: 1,
+        catchphrase: '「ダメ元で聞いてみよう！」で外の世界から味方を連れてくる交渉人',
+        name: '巻き込み交渉',
+        desc: 'お店の予約や大人への相談、企業への協賛のお願いなど、ちょっと緊張する相手にも物怖じせず声をかけて協力や資金をとってくる力。',
+        scene: '企業への協賛お願い・資金集め、イベント会場の交渉、ゲストや外部団体とのコラボ相談。',
+        goodUse: '相手にとってのメリットとLoopusの想いをうまくつなげて、「ぜひ応援するよ！」と外から協力やお金を引き出せる！',
+        overuse: '外でどんどん約束を取り付けてきて、チーム内のメンバーへの連絡や相談が後回しになっちゃうことがあるよ。',
+        recipe: '外部の人と話す前に、「お金・ルール管理」や「つなぎ役・調整」の仲間と「どこまでOKにするか」をすり合わせておこう！'
+      },
+      {
+        id: 4,
+        domainId: 1,
+        catchphrase: '「まず1回試してみよう！」の爆速行動でチームに風を起こすチャレンジャー',
+        name: 'スピード実行',
+        desc: 'テスト勉強でもイベント準備でも、計画をじっくり練りすぎるより「まず1回やってみよう！」とすぐ動いて形にしながら直していく力。',
+        scene: 'SNSの流行ネタの即投稿、新しい企画のお試し実施、会議で決まったことのその日のうちのスタート。',
+        goodUse: '「まず今週試してみよう！」とすぐ行動に移して、机の上の悩みよりもリアルな反応をチームに持ち帰れる！',
+        overuse: '確認や相談を飛ばして突っ走ってしまい、「え、いつの間に決まったの？」と周りを置いてけぼりにしちゃうことも。',
+        recipe: '動き出す前にLINEで「今から3日間だけこのお試しやってみるね！」と一言シェアしてからスタートしよう！'
+      },
+
+      // 【グループ2：形にする・現場を支える力】
+      {
+        id: 5,
+        domainId: 2,
+        catchphrase: 'バタバタする本番でも冷静に周りを見て場を回す頼れる司令塔',
+        name: '現場ディレクション',
+        desc: '文化祭の当日や大人数の集まりで全体を見渡し、「〇〇ちゃんこっちお願い！」とテキパキ声をかけて現場をスムーズに回す力。',
+        scene: 'イベント当日の運営リーダー、タイムスケジュール管理、急な予定変更やハプニングが起きたときの現場判断。',
+        goodUse: 'みんなが焦る場面でも冷静に全体を見て、的確に指示を出して当日の現場をバッチリ救える！',
+        overuse: '普段のゆるい話し合いでも仕切りすぎてしまい、他のメンバーが発言しづらくなったり受け身になったりすることも。',
+        recipe: 'イベント当日は司令塔に徹して、普段の企画会議ではあえて聞き役に回るメリハリをつけると最強だよ！'
+      },
+      {
+        id: 6,
+        domainId: 2,
+        catchphrase: '本番から逆算して「いつ・誰が・何をするか」をピタッと組む計画職人',
+        name: '段取りマスター',
+        desc: '友だちとの旅行や提出物の締切で、本番の日から逆算してやるべき順番やスケジュール・役割分担を漏れなく組み立てる力。',
+        scene: '企画全体の進行表作り、当日の持ち物リスト・タイムテーブル作成、LINEでの締切リマインド管理。',
+        goodUse: '大きな目標を「いつまでに・誰が・何をやるか」のわかりやすいリストにして、チーム全員に安心感を届けられる！',
+        overuse: '予定が狂ったり急なアイデア変更が入ったりすると強いストレスを感じて、柔軟な変更を嫌がっちゃうことも。',
+        recipe: 'スケジュールを組むときに、最初から「予備日」を2〜3日多めに作っておくと心がグッとラクになるよ！'
+      },
+      {
+        id: 7,
+        domainId: 2,
+        catchphrase: 'お金・締切・約束事をキッチリ守って団体の信頼を支える守護神',
+        name: 'お金・ルール管理',
+        desc: '旅行の割り勘計算やサークルのお会計、提出期限などの数字やルールを正確に管理して、みんなが安心して動ける土台を守る力。',
+        scene: '毎月の会計・レシート精算、イベントごとの予算管理、企業との約束事やルール違反がないかのチェック。',
+        goodUse: '活動が広がる中でゆるくなりがちなお金や約束事をキッチリ整えて、Loopusが長く続く土台を守れる！',
+        overuse: 'ルールや予算の正しさにこだわりすぎて、「前例がないからダメ」と仲間のチャレンジにブレーキをかけすぎることも。',
+        recipe: '「それは無理」と止める代わりに、「この予算内ならできるよ！」「このルールを守ればOK！」と代わりの案を出してみよう！'
+      },
+      {
+        id: 8,
+        domainId: 2,
+        catchphrase: '「もっと良くできるはず！」で細部まで美しく磨き上げるクオリティ職人',
+        name: 'こだわり仕上げ',
+        desc: '発表スライドのレイアウトやインスタ投稿のデザインなど、細かい違和感にも気づいて納得いくまでクオリティを高める力。',
+        scene: 'インスタ画像やチラシのデザイン微調整、企業向け提案資料のブラッシュアップ、当日の会場レイアウト仕上げ。',
+        goodUse: '80点の出来を95点・100点に磨き上げて、「Loopusって完成度高いよね！」と周りから信頼される！',
+        overuse: '細部のこだわりが強すぎて締切ギリギリになったり、他の人の雑な部分が目についてイライラしたりすることも。',
+        recipe: '「今日はここまでできたら一旦提出する！」とタイマーをかけて区切りをつけると、スピードと質を両立できるよ！'
+      },
+
+      // 【グループ3：チームをつなぐ・空気をつくる力】
+      {
+        id: 9,
+        domainId: 3,
+        catchphrase: '小さな変化に気づいて寄り添い「ここなら大丈夫」をつくる優しい味方',
+        name: '安心感づくり',
+        desc: 'グループの中で発言できていない人やちょっと疲れていそうな友だちに気づいて、さりげなく声をかけ温かい空気をつくる力。',
+        scene: 'ボランティアメンバーのフォロー、1対1での相談聞き役、新メンバーが緊張せず意見を出せる雰囲気づくり。',
+        goodUse: '忙しくて孤立しそうな仲間や新入生にいち早く気づいて声をかけ、誰も辞めたくならない居場所を守れる！',
+        overuse: 'みんなの気持ちに寄り添いすぎて自分自身が疲れちゃったり、厳しい決断を先延ばしにしたりすることも。',
+        recipe: '仲間の話を聞く時間と、自分ひとりでスマホを置いてリフレッシュするオフの時間を意識的に分けてみよう！'
+      },
+      {
+        id: 10,
+        domainId: 3,
+        catchphrase: '「めっちゃすごい！」「助かる！」の明るい一言でチームの火を灯す太陽',
+        name: 'ムードメーカー',
+        desc: '自分のリアクションや明るい声かけで、テスト前や準備で疲れ気味のグループの空気もパッと明るくしてやる気に火をつける力。',
+        scene: '会議の最初の雑談タイム、LINEグループでのスタンプや褒め言葉、イベント本番前のテンションアップ。',
+        goodUse: '仲間のちょっとした頑張りを見つけて「めっちゃ助かる！」「最高！」と声に出し、ボランティア組織の熱量を高められる！',
+        overuse: '真面目な反省会や課題を話し合う場面でもノリで流してしまい、大事な問題がふわっと終わっちゃうことも。',
+        recipe: '場を明るく盛り上げつつ、会議の最後には「で、一番大事な課題は何だっけ？」と確認する習慣をつけてみよう！'
+      },
+      {
+        id: 11,
+        domainId: 3,
+        catchphrase: '違う担当や意見の間に入ってピタッと噛み合わせるチームの架け橋',
+        name: 'つなぎ役・調整',
+        desc: '意見が分かれた友だち同士や違う担当の間に入って、「つまりこういうことだよね？」と双方の気持ちを翻訳してまとめる力。',
+        scene: '企画班・SNS班・渉外班の連携調整、外部パートナーとの連絡窓口、人と人をつなぐ紹介役。',
+        goodUse: '担当ごとの「言った・言わない」や温度差をいち早くキャッチして、お互いの言い分をわかりやすくすり合わせられる！',
+        overuse: 'いろんな人の板挟みになって自分の本音を我慢しすぎたり、全部の連絡を一人で抱えてパンクしたりすることも。',
+        recipe: '自分がずっと伝言ゲームをするのではなく、当事者同士が直接話せるグループLINEや場を作ってつないであげよう！'
+      },
+      {
+        id: 12,
+        domainId: 3,
+        catchphrase: '「なぜこの活動が面白いのか」と先輩の知恵を次の代へつなぐ語り部',
+        name: '想い・ノウハウ継承',
+        desc: '自分たちの活動がなぜ面白いのか、大切にしてることやうまくいったコツを後輩や新メンバーにわかりやすく伝える力。',
+        scene: '新入生やボランティア向けの説明会、過去の失敗・成功メモのまとめ、活動の理念やストーリーの共有。',
+        goodUse: '先輩たちの経験や「なぜLoopusをやってるのか」を言葉にして残すことで、新しい仲間がすぐ活躍できるようにできる！',
+        overuse: '「前はこうやってたから」と過去のやり方にこだわりすぎて、新しい時代に合った変化を止めちゃうことも。',
+        recipe: '「ずっと大切にしたい想い」と「どんどん変えていいやり方」の2つに分けて後輩に伝えてみよう！'
+      },
+
+      // 【グループ4：先を読む・仕組みを整える力】
+      {
+        id: 13,
+        domainId: 4,
+        catchphrase: '「次これが来そう！」の波を誰よりも早く掴むアンテナ感度の達人',
+        name: 'トレンド・変化キャッチ',
+        desc: 'TikTokやインスタで流行っているものや、周りの友だちのちょっとした反応から「次これが来そう！」といち早く気づく力。',
+        scene: 'SNSの「いいね」や伸び方の分析、同世代のリアルなニーズ探し、次のイベントテーマの種探し。',
+        goodUse: '数字の動きや世の中の空気から「今これがウケそう！」というヒントを見つけて、みんなに新しいアイデアを届けられる！',
+        overuse: '新しい流行やネタに次々と目移りしてしまい、今進めている企画が中途半端になっちゃうことも。',
+        recipe: '見つけたネタは「今すぐ試す1つ」と「次の企画メモに貯めておくもの」に分けて管理するとバッチリ！'
+      },
+      {
+        id: 14,
+        domainId: 4,
+        catchphrase: 'ごちゃごちゃを整理して「誰でもサクサク動ける形」にする仕組み化名人',
+        name: 'スッキリ仕組み化',
+        desc: 'ごちゃごちゃしたLINEのやり取りや作業の手順を整理して、「この順番でやれば誰でもできる！」と分かりやすく整える力。',
+        scene: 'LINEノートや共有フォルダの整理、ボランティアメンバーのシフト・連絡ルール作り、チェックリスト化。',
+        goodUse: '特定の人に頼りきりだった作業をスッキリ整理して、「これを見れば誰でも同じようにできる！」という仕組みを作れる！',
+        overuse: 'きれいなルールや表を作ること自体に夢中になって、現場のメンバーからすると「ちょっと複雑すぎる…」となることも。',
+        recipe: '仕組みを作ったらまず仲間2人に使ってもらって、「一番めんどくさい手順はどこ？」と聞いて削ぎ落としてみよう！'
+      },
+      {
+        id: 15,
+        domainId: 4,
+        catchphrase: '「当日雨降ったらどうする？」を先に考えてピンチを防ぐ安心の参謀',
+        name: '先回りリスク対策',
+        desc: 'イベントや旅行の計画を見たとき、「当日雨降ったら？」「時間押したらヤバいかも」と事前に穴を見つけて代替案を備える力。',
+        scene: 'イベント当日の雨天・遅延対策、SNS投稿の炎上チェック、予算オーバー防止の事前確認。',
+        goodUse: '「もし参加者が少なかったら？」「機材が止まったら？」と事前にプランBを用意して、本番のピンチを防げる！',
+        overuse: '心配な点やリスクばかりを先に言いすぎて、企画を考えている仲間のワクワク感を冷めさせちゃうことも。',
+        recipe: '心配なことを伝えるときは「〇〇が不安だから、代わりに△△を準備しておこう！」と解決策をセットで言おう！'
+      },
+      {
+        id: 16,
+        domainId: 4,
+        catchphrase: '「そもそも何のためにやるんだっけ？」でチームの軸をピシッと定める哲学者',
+        name: '「そもそも」思考',
+        desc: '準備や作業が忙しくなってきたときほど、「そもそも何のためにこれやるんだっけ？」と立ち止まって本質的な目的を考える力。',
+        scene: '新しい取り組みの方向性決め、イベントのコンセプト作り、意見が割れて迷ったときの判断軸づくり。',
+        goodUse: '作業に追われて目的を見失いそうなときに大事な問いを投げかけて、チーム全体の進む方向をピシッと整えられる！',
+        overuse: '会議のたびに「そもそもさ…」と前提をひっくり返してしまい、なかなか結論が出ずに話し合いが長引くことも。',
+        recipe: '「そもそも」の議論は企画のスタート時に出し切って、動き出したらみんなを応援する側に回ってみよう！'
+      }
+    ];
+
+    /**
+     * 3. 全64問の質問リスト（高校生・大学生の日常シーン版・厳密一致）
+     * Q01〜Q16: 第1ブロック（正項目1／32問コースでも出題）
+     * Q17〜Q32: 第2ブロック（正項目2／64問フルコースで出題）
+     * Q33〜Q48: 第3ブロック（逆転項目／32問コースでも出題）
+     * Q49〜Q64: 第4ブロック（正項目3／64問フルコースで出題）
+     */
+    const QUESTIONS = [
+      // 第1ブロック (Q01 - Q16)
+      { id: 1, strengthId: 1, isReverse: false, text: '文化祭の出し物やゼミの発表で、まだ何も決まっていないとき「とりあえずこんな感じでやってみない？」と最初の案を出すのが好きだ。' },
+      { id: 2, strengthId: 2, isReverse: false, text: 'インスタのストーリーやサークルの宣伝文をつくるとき、「どう書いたらみんなが興味を持ってくれるかな」と工夫するのが楽しい。' },
+      { id: 3, strengthId: 3, isReverse: false, text: 'お店の予約や先生・大人への相談、協賛のお願いなど、ちょっと緊張する相手にも「ダメ元で聞いてみよう！」と連絡できる。' },
+      { id: 4, strengthId: 4, isReverse: false, text: 'テスト勉強でもイベント準備でも、計画をじっくり練りすぎるより「まずは1回やってみよう！」とすぐ手を動かすタイプだ。' },
+      { id: 5, strengthId: 5, isReverse: false, text: '文化祭の当日や大人数での集まりで、周りを見渡しながら「〇〇ちゃんこっちお願い！」と声をかけて回すのが自然だ。' },
+      { id: 6, strengthId: 6, isReverse: false, text: '友だちとの旅行や提出物の締切では、本番の日から逆算して「いつまでに何をやるか」スケジュールを組むのが好きだ。' },
+      { id: 7, strengthId: 7, isReverse: false, text: '旅行の割り勘計算やサークルのお会計、提出期限などの数字やルールがきっちり合っているとスッキリする。' },
+      { id: 8, strengthId: 8, isReverse: false, text: '発表スライドのレイアウトやインスタ投稿のデザインなど、細かいところまで「もっと良くできるはず」とこだわって仕上げたい。' },
+      { id: 9, strengthId: 9, isReverse: false, text: 'グループの中で発言できていない人や、ちょっと疲れていそうな友だちに気づいて、さりげなく声をかけることが多い。' },
+      { id: 10, strengthId: 10, isReverse: false, text: '自分のリアクションや明るい声かけで、ちょっと静かなグループや会議の空気をパッと明るくできる。' },
+      { id: 11, strengthId: 11, isReverse: false, text: '意見が分かれた友だち同士の間に入って、「つまりこういうことだよね？」と双方の気持ちを整理してまとめるのが得意だ。' },
+      { id: 12, strengthId: 12, isReverse: false, text: '自分たちの活動がなぜ面白いのか、大切にしてることを後輩や新メンバーにわかりやすく伝えるのが好きだ。' },
+      { id: 13, strengthId: 13, isReverse: false, text: 'TikTokやインスタで流行っているものや、周りの友だちのちょっとした反応から「次これが来そう！」と気づくのが早い。' },
+      { id: 14, strengthId: 14, isReverse: false, text: 'ごちゃごちゃしたLINEのやり取りや作業の手順を整理して、「この順番でやれば誰でもできる！」と分かりやすくするのが好きだ。' },
+      { id: 15, strengthId: 15, isReverse: false, text: 'イベントや旅行の計画を見たとき、「当日雨降ったらどうする？」「時間押したらヤバいかも」と事前に穴を見つけて備えたくなる。' },
+      { id: 16, strengthId: 16, isReverse: false, text: '準備や作業が忙しくなってきたときほど、「そもそも何のためにこれやるんだっけ？」と立ち止まって考えたくなる。' },
+
+      // 第2ブロック (Q17 - Q32)
+      { id: 17, strengthId: 1, isReverse: false, text: '誰もやったことがない新しい企画や遊びのアイデアを思いつくと、誰かに話したくてウズウズする。' },
+      { id: 18, strengthId: 2, isReverse: false, text: '自分がハマっているお店やイベントの良さを友だちに熱く語って、「行ってみたい！」と言わせるのが好きだ。' },
+      { id: 19, strengthId: 3, isReverse: false, text: '「こっちにもこういうメリットがあるから協力してほしい！」と、相手が思わずOKしたくなる伝え方を考えるのが好きだ。' },
+      { id: 20, strengthId: 4, isReverse: false, text: '「これ面白そう！」と思ったら、その日のうちに調べたり試したりして最初の一歩を踏み出していることが多い。' },
+      { id: 21, strengthId: 5, isReverse: false, text: '当日に急な予定変更やハプニングが起きても、焦るより「よし、じゃあこうしよう！」と切り替えられる。' },
+      { id: 22, strengthId: 6, isReverse: false, text: 'グループ活動が始まると、自然と「誰が・いつまでに・何をやるか」をメモやLINEのノートにまとめたくなっている。' },
+      { id: 23, strengthId: 7, isReverse: false, text: 'みんなで何かを進めるとき、「予算オーバーしてないかな？」「ルール違反にならないかな？」と自然とチェックしている。' },
+      { id: 24, strengthId: 8, isReverse: false, text: '他の人が見過ごすような文字のズレや表現の違和感にも気づいて、納得いくまで直したくなる。' },
+      { id: 25, strengthId: 9, isReverse: false, text: '話し合いの場では、まず「それいいね！」と相手の意見を受け止めて、誰でも話しやすい空気をつくることを大事にしている。' },
+      { id: 26, strengthId: 10, isReverse: false, text: '友だちや仲間の頑張りを見つけたら、「めっちゃすごい！」「マジで助かる！」とすぐ言葉にして伝えたくなる。' },
+      { id: 27, strengthId: 11, isReverse: false, text: '「〇〇ちゃんと△△くんを繋いだら絶対話が合う！」と、人と人との接点をつくるのが好きだ。' },
+      { id: 28, strengthId: 12, isReverse: false, text: '一度やってうまくいったコツや失敗談は、次の代が困らないようにメモや引き継ぎ資料に残しておきたくなる。' },
+      { id: 29, strengthId: 13, isReverse: false, text: 'アンケートの結果やSNSの「いいね」の伸び方を見て、「なんでこれがウケたんだろう？」と考えるのが好きだ。' },
+      { id: 30, strengthId: 14, isReverse: false, text: '「毎回同じことで迷ってるな」と気づいたら、テンプレやチェックリストを作ってラクに回せるようにしたくなる。' },
+      { id: 31, strengthId: 15, isReverse: false, text: '何かを進める前に、うまくいくイメージだけでなく「もし失敗したらどうカバーするか」まで自然と頭が回る。' },
+      { id: 32, strengthId: 16, isReverse: false, text: '目先のアイデアや流行に飛びつく前に、「これって本当にみんなが求めてることかな？」と根本の目的をじっくり考える。' },
+
+      // 第3ブロック (Q33 - Q48: 逆転項目)
+      { id: 33, strengthId: 1, isReverse: true, text: '一から新しい企画を考えるよりも、すでにあるやり方や前年の企画をもっと良くする方がやりやすい。' },
+      { id: 34, strengthId: 2, isReverse: true, text: '表に立ってSNSや言葉でアピールするよりも、裏方の準備や作業に集中している方が落ち着く。' },
+      { id: 35, strengthId: 3, isReverse: true, text: '外部の大人や知らない人に交渉するよりも、いつもの仲間内で力を合わせて動く方がずっと好きだ。' },
+      { id: 36, strengthId: 4, isReverse: true, text: '勢いでスタートするよりも、必要な情報や準備をぜんぶ揃えてから安心して始めたい。' },
+      { id: 37, strengthId: 5, isReverse: true, text: '全体の進行を仕切るよりも、自分に任された一つの作業にじっくり集中している方が力を出せる。' },
+      { id: 38, strengthId: 6, isReverse: true, text: '事前に細かいスケジュールをカッチリ決めるよりも、その日の気分や流れに合わせて動く方が性に合っている。' },
+      { id: 39, strengthId: 7, isReverse: true, text: '細かいお金の計算やルールの確認よりも、アイデア出しやみんなとワイワイ話す時間の方が好きだ。' },
+      { id: 40, strengthId: 8, isReverse: true, text: '細かいデザインや表現に時間をかけるよりも、大体の形ができたらスピード重視で次へ進む方だ。' },
+      { id: 41, strengthId: 9, isReverse: true, text: 'みんなの感情や空気を読むことよりも、話し合いの結論ややるべきことをハッキリ決める方に意識が向きやすい。' },
+      { id: 42, strengthId: 10, isReverse: true, text: 'テンション高く場を盛り上げるよりも、落ち着いたトーンで冷静に周りを見守るスタンスの方が自分らしい。' },
+      { id: 43, strengthId: 11, isReverse: true, text: 'いろんな人の間に入って調整するよりも、自分の担当パートを一人で黙々と進める方が気楽だ。' },
+      { id: 44, strengthId: 12, isReverse: true, text: '過去のやり方や経緯をまとめて引き継ぐよりも、今のメンバーで新しいやり方を一からつくる方が楽しい。' },
+      { id: 45, strengthId: 13, isReverse: true, text: '世の中の流行や数字を追いかけるよりも、自分たちが「これがやりたい！」と信じる王道のやり方を大事にしたい。' },
+      { id: 46, strengthId: 14, isReverse: true, text: 'ルールやマニュアルで型にはめるよりも、その場の状況に合わせて臨機応変に動く方が好きだ。' },
+      { id: 47, strengthId: 15, isReverse: true, text: '起きるかどうかわからない心配を事前にするよりも、「何か起きたらそのとき考えよう！」と軽やかに進む方だ。' },
+      { id: 48, strengthId: 16, isReverse: true, text: '「なぜやるのか」を長く議論し続けるよりも、決まった方針に沿って具体的な作業をどんどん進める方が好きだ。' },
+
+      // 第4ブロック (Q49 - Q64)
+      { id: 49, strengthId: 1, isReverse: false, text: '正解が決まっていない自由テーマの課題やイベントほど、テンションが上がってアイデアが湧いてくる。' },
+      { id: 50, strengthId: 2, isReverse: false, text: '自分が作った画像や紹介文を見て、友だちやフォロワーから「めっちゃいいね！」「行きたい！」と反応が来るとすごく嬉しい。' },
+      { id: 51, strengthId: 3, isReverse: false, text: '欲しい場所や協力者を自分の声かけで引っ張ってきて、みんなで「やったー！」と盛り上がるときに一番やりがいを感じる。' },
+      { id: 52, strengthId: 4, isReverse: false, text: '実際に動かしながら「あ、ここは変えよう」とテンポよく改善していくスピード感が心地よい。' },
+      { id: 53, strengthId: 5, isReverse: false, text: 'みんなの忙しさや時間の進み具合を見て、その場で役割を微調整しながらスムーズに回せると気持ちいい。' },
+      { id: 54, strengthId: 6, isReverse: false, text: '持ち物リストや進行表がバッチリ整って、予定通りに物事が進んでいくのを見ると安心する。' },
+      { id: 55, strengthId: 7, isReverse: false, text: 'お金の管理や約束事をしっかり守って、みんなが安心して活動できる土台を支えることにやりがいを感じる。' },
+      { id: 56, strengthId: 8, isReverse: false, text: '「せっかく出すなら最高のものにしたい！」と最後の一手間を惜しまず磨き上げたときに達成感がある。' },
+      { id: 57, strengthId: 9, isReverse: false, text: '緊張していた新入生やメンバーが「ここなら安心して話せる」と笑顔になってくれるとすごく嬉しい。' },
+      { id: 58, strengthId: 10, isReverse: false, text: 'テスト前や準備でみんなが疲れているときでも、明るい一言でチームのテンションを上げられるのが嬉しい。' },
+      { id: 59, strengthId: 11, isReverse: false, text: '違うチームや担当同士の連絡役になって、みんなの連携がピタッと噛み合った瞬間にやりがいを感じる。' },
+      { id: 60, strengthId: 12, isReverse: false, text: 'メンバーが入れ替わっても「このチームらしさ」や良い伝統がちゃんと受け継がれていくのを見ると嬉しい。' },
+      { id: 61, strengthId: 13, isReverse: false, text: '周囲の空気や流行の変化にいち早く気づいて、「次はこれやってみようよ！」と提案してハマったときが最高だ。' },
+      { id: 62, strengthId: 14, isReverse: false, text: '複雑だった準備や作業がスッキリ整理されて、みんなが迷わずサクサク動ける状態になると気持ちいい。' },
+      { id: 63, strengthId: 15, isReverse: false, text: '事前に用意しておいた代替案（プランB）のおかげで当日のピンチを無事に乗り切れたとき、心の中でガッツポーズする。' },
+      { id: 64, strengthId: 16, isReverse: false, text: '意見が割れて迷ったとき、活動の原点や一番大切な目的に立ち返って「こうしよう！」と軸を示せるとやりがいを感じる。' }
+    ];
+
+    /**
+     * 4. 活動テーマ別「役割フィット」定義（10人マップ用・6カテゴリ）
+     */
+    const ROLE_FIT_THEMES = [
+      {
+        title: '① イベント企画立ち上げ',
+        desc: '新しい企画のアイデア出しやテーマ・軸づくり',
+        strengthIds: [1, 16, 13],
+        badgeColor: 'bg-orange-50 text-orange-700 border-orange-200'
+      },
+      {
+        title: '② イベント当日運営',
+        desc: '本番の現場回し・進行スケジュール・トラブル対応',
+        strengthIds: [5, 6, 15],
+        badgeColor: 'bg-indigo-50 text-indigo-700 border-indigo-200'
+      },
+      {
+        title: '③ SNS・広報発信',
+        desc: 'インスタ/TikTok発信・画像デザイン・トレンド対応',
+        strengthIds: [2, 8, 4],
+        badgeColor: 'bg-amber-50 text-amber-700 border-amber-200'
+      },
+      {
+        title: '④ 渉外・資金調達',
+        desc: '企業への協賛営業・外部コラボ・資金集め',
+        strengthIds: [3, 2, 11],
+        badgeColor: 'bg-rose-50 text-rose-700 border-rose-200'
+      },
+      {
+        title: '⑤ ボランティアメンバー管理',
+        desc: '無償メンバーのやる気アップ・相談フォロー・引き継ぎ',
+        strengthIds: [9, 10, 12],
+        badgeColor: 'bg-emerald-50 text-emerald-700 border-emerald-200'
+      },
+      {
+        title: '⑥ 経理・ルール仕組み化',
+        desc: 'お会計・予算管理・LINEや作業ルールの整理',
+        strengthIds: [7, 14, 6],
+        badgeColor: 'bg-violet-50 text-violet-700 border-violet-200'
+      }
+    ];
+
+    /**
+     * 5. 初期プリセット：Loopus 10名メンバーデータ
+     */
+    const PRESET_TEAM_MEMBERS = [
+      {
+        id: 'preset-1',
+        name: 'ハルト',
+        role: '代表・全体統括',
+        scores: [26, 20, 24, 21, 23, 16, 14, 17, 19, 22, 20, 21, 19, 17, 16, 27]
+      },
+      {
+        id: 'preset-2',
+        name: 'ミサキ',
+        role: 'イベント企画リーダー',
+        scores: [27, 24, 18, 25, 19, 17, 13, 18, 18, 21, 17, 16, 23, 15, 15, 20]
+      },
+      {
+        id: 'preset-3',
+        name: 'ケンタ',
+        role: '当日運営ディレクター',
+        scores: [16, 15, 17, 19, 27, 26, 20, 19, 18, 17, 23, 18, 15, 19, 24, 16]
+      },
+      {
+        id: 'preset-4',
+        name: 'アオイ',
+        role: 'SNS運用・デザイン',
+        scores: [19, 27, 14, 23, 15, 16, 14, 26, 19, 20, 16, 17, 25, 16, 15, 18]
+      },
+      {
+        id: 'preset-5',
+        name: 'ソウタ',
+        role: '渉外・協賛営業',
+        scores: [21, 22, 27, 24, 20, 14, 15, 15, 18, 25, 23, 16, 20, 14, 14, 17]
+      },
+      {
+        id: 'preset-6',
+        name: 'ユイ',
+        role: 'ボランティアコミュニティ担当',
+        scores: [15, 19, 16, 16, 17, 18, 16, 18, 27, 25, 23, 24, 17, 17, 18, 19]
+      },
+      {
+        id: 'preset-7',
+        name: 'リク',
+        role: '運営進行・制作サポート',
+        scores: [14, 16, 15, 17, 21, 26, 21, 25, 23, 16, 19, 18, 15, 19, 24, 17]
+      },
+      {
+        id: 'preset-8',
+        name: 'ナナミ',
+        role: '広報PR・ライティング',
+        scores: [18, 26, 17, 18, 15, 17, 15, 21, 24, 20, 19, 25, 20, 16, 16, 23]
+      },
+      {
+        id: 'preset-9',
+        name: 'タイガ',
+        role: '資金調達・新規企画',
+        scores: [25, 21, 26, 22, 19, 14, 12, 15, 17, 24, 18, 15, 23, 13, 14, 18]
+      },
+      {
+        id: 'preset-10',
+        name: 'コトネ',
+        role: '会計・ルール管理',
+        scores: [13, 15, 14, 15, 18, 25, 27, 20, 19, 15, 18, 19, 16, 24, 23, 18]
+      }
+    ];
+
+    /**
+     * 6. アプリ状態管理（State）
+     */
+    const STORAGE_KEY = 'loopus_strengths_student_v3';
+    const QUESTIONS_PER_PAGE = 4;
+
+    let state = {
+      activeTab: 'test',
+      quizStarted: false,
+      courseLength: 32, // 32 or 64
+      currentStep: 1, // 1..8 (32問) or 1..16 (64問)
+      userName: '',
+      userRole: '',
+      answers: {}, // { questionId: 1..7 }
+      currentResult: null,
+      detailMode: 'tab', // 'tab' or 'all'
+      selectedTopTabIdx: 0, // 0..3
+      teamMembers: [],
+      encyclopediaFilter: 0
+    };
+
+    /**
+     * 7. 初期化＆ストレージ連携
+     */
+    function initApp() {
+      loadFromStorage();
+      if (!state.teamMembers || state.teamMembers.length === 0) {
+        state.teamMembers = PRESET_TEAM_MEMBERS.map(m => buildMemberProfile(m.id, m.name, m.role, m.scores, 'プリセット'));
+      }
+      document.getElementById('user-name-input').value = state.userName || '';
+      document.getElementById('user-role-input').value = state.userRole || '';
+      updateStatusBadges();
+      renderTestView();
+      renderReport();
+      renderTeamAnalysis();
+      renderEncyclopedia();
+      switchTab(state.activeTab || 'test', false);
+    }
+
+    function saveToStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          quizStarted: state.quizStarted,
+          courseLength: state.courseLength,
+          currentStep: state.currentStep,
+          userName: state.userName,
+          userRole: state.userRole,
+          answers: state.answers,
+          currentResult: state.currentResult,
+          teamMembers: state.teamMembers
+        }));
+      } catch (e) {
+        // ストレージ制限環境でも継続動作
+      }
+    }
+
+    function loadFromStorage() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          state.quizStarted = Boolean(parsed.quizStarted);
+          state.courseLength = parsed.courseLength === 64 ? 64 : 32;
+          state.currentStep = parsed.currentStep || 1;
+          state.userName = parsed.userName || '';
+          state.userRole = parsed.userRole || '';
+          state.answers = parsed.answers || {};
+          state.currentResult = parsed.currentResult || null;
+          if (Array.isArray(parsed.teamMembers) && parsed.teamMembers.length > 0) {
+            state.teamMembers = parsed.teamMembers;
+          }
+        }
+      } catch (e) {
+        // 無視
+      }
+    }
+
+    /**
+     * 8. タブ切り替え
+     */
+    function switchTab(tabName, scrollTop = true) {
+      state.activeTab = tabName;
+      const tabs = ['test', 'report', 'team', 'encyclopedia'];
+      tabs.forEach(t => {
+        const view = document.getElementById(`view-${t}`);
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if (t === tabName) {
+          view.classList.remove('hidden');
+          btn.classList.add('bg-slate-900', 'text-white', 'shadow-xs');
+          btn.classList.remove('text-slate-600', 'hover:bg-slate-100');
+        } else {
+          view.classList.add('hidden');
+          btn.classList.remove('bg-slate-900', 'text-white', 'shadow-xs');
+          btn.classList.add('text-slate-600', 'hover:bg-slate-100');
+        }
+      });
+
+      if (tabName === 'test') renderTestView();
+      if (tabName === 'report') renderReport();
+      if (tabName === 'team') renderTeamAnalysis();
+      if (tabName === 'encyclopedia') renderEncyclopedia();
+
+      if (scrollTop) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    /**
+     * 9. 診断画面（ウェルカム ＆ 16Personalities風サークルUI）
+     */
+    function getActiveQuestionList() {
+      if (state.courseLength === 32) {
+        // サクッと32問コース：第1ブロック(Q01-16:正) ＋ 第3ブロック(Q33-48:逆) の均等32問
+        return [
+          ...QUESTIONS.slice(0, 16),
+          ...QUESTIONS.slice(32, 48)
+        ];
+      }
+      return QUESTIONS;
+    }
+
+    function handleProfileInput() {
+      state.userName = document.getElementById('user-name-input').value.trim();
+      state.userRole = document.getElementById('user-role-input').value.trim();
+      saveToStorage();
+    }
+
+    function startQuiz(length) {
+      state.courseLength = length;
+      state.quizStarted = true;
+      state.currentStep = 1;
+      saveToStorage();
+      renderTestView();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function backToWelcome() {
+      state.quizStarted = false;
+      saveToStorage();
+      renderTestView();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderTestView() {
+      const welcomeEl = document.getElementById('test-welcome-screen');
+      const quizEl = document.getElementById('test-quiz-screen');
+
+      if (!state.quizStarted) {
+        welcomeEl.classList.remove('hidden');
+        quizEl.classList.add('hidden');
+        return;
+      }
+
+      welcomeEl.classList.add('hidden');
+      quizEl.classList.remove('hidden');
+
+      const activeQuestions = getActiveQuestionList();
+      const totalQ = activeQuestions.length;
+      const totalSteps = Math.ceil(totalQ / QUESTIONS_PER_PAGE);
+      if (state.currentStep > totalSteps) state.currentStep = totalSteps;
+
+      const step = state.currentStep;
+      const startIdx = (step - 1) * QUESTIONS_PER_PAGE;
+      const pageQuestions = activeQuestions.slice(startIdx, startIdx + QUESTIONS_PER_PAGE);
+
+      // 回答済みカウント＆「あと〇問！」表示
+      const answeredCount = activeQuestions.filter(q => Boolean(state.answers[q.id])).length;
+      const remainingCount = totalQ - answeredCount;
+      const pct = Math.round((answeredCount / totalQ) * 100);
+
+      let cheerText = `あと ${remainingCount} 問！直感でサクサクいこう✨`;
+      if (remainingCount === 0) {
+        cheerText = '全問回答完了！結果を見よう🎉';
+      } else if (remainingCount <= 8) {
+        cheerText = `あと ${remainingCount} 問！ラストスパート🔥`;
+      } else if (pct >= 50) {
+        cheerText = `あと ${remainingCount} 問！折り返し突破👍`;
+      }
+
+      document.getElementById('step-indicator-badge').textContent = `${step} / ${totalSteps} ページ`;
+      document.getElementById('cheer-message-label').textContent = cheerText;
+      document.getElementById('answered-count-label').textContent = answeredCount;
+      document.getElementById('total-count-label').textContent = totalQ;
+      document.getElementById('progress-bar-fill').style.width = `${pct}%`;
+
+      // 16Personalities風の7段階サイズ違い丸型ボタン定義
+      const circleOptions = [
+        { val: 1, sizeCls: 'w-11 h-11 sm:w-12 sm:h-12', ringCls: 'border-rose-400 hover:bg-rose-50', activeCls: 'bg-rose-500 border-rose-500 text-white shadow-sm' },
+        { val: 2, sizeCls: 'w-9 h-9 sm:w-10 sm:h-10', ringCls: 'border-rose-300 hover:bg-rose-50', activeCls: 'bg-rose-400 border-rose-400 text-white shadow-sm' },
+        { val: 3, sizeCls: 'w-8 h-8 sm:w-9 sm:h-9', ringCls: 'border-rose-200 hover:bg-rose-50/70', activeCls: 'bg-rose-300 border-rose-300 text-white shadow-sm' },
+        { val: 4, sizeCls: 'w-7 h-7 sm:w-8 sm:h-8', ringCls: 'border-slate-300 hover:bg-slate-100', activeCls: 'bg-slate-500 border-slate-500 text-white shadow-sm' },
+        { val: 5, sizeCls: 'w-8 h-8 sm:w-9 sm:h-9', ringCls: 'border-emerald-200 hover:bg-emerald-50/70', activeCls: 'bg-emerald-400 border-emerald-400 text-white shadow-sm' },
+        { val: 6, sizeCls: 'w-9 h-9 sm:w-10 sm:h-10', ringCls: 'border-emerald-300 hover:bg-emerald-50', activeCls: 'bg-emerald-500 border-emerald-500 text-white shadow-sm' },
+        { val: 7, sizeCls: 'w-11 h-11 sm:w-12 sm:h-12', ringCls: 'border-emerald-400 hover:bg-emerald-50', activeCls: 'bg-emerald-600 border-emerald-600 text-white shadow-sm' }
+      ];
+
+      const container = document.getElementById('questions-container');
+      container.innerHTML = pageQuestions.map((q, idx) => {
+        const displayNum = startIdx + idx + 1;
+        const currentVal = state.answers[q.id] || null;
+        return `
+          <div id="q-card-${q.id}" class="bg-white rounded-3xl border-2 ${currentVal ? 'border-emerald-200/80' : 'border-slate-200/80'} shadow-card p-5 sm:p-7 transition-all duration-200">
+            <div class="flex items-start gap-3 mb-5">
+              <span class="flex-shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-2xl text-xs font-black ${currentVal ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500'}">
+                ${displayNum}
+              </span>
+              <p class="text-sm sm:text-base font-bold text-slate-800 leading-relaxed pt-0.5">
+                ${escapeHtml(q.text)}
+              </p>
+            </div>
+
+            <!-- 16Personalities風 7段階サークルUI -->
+            <div class="max-w-lg mx-auto">
+              <div class="flex items-center justify-between gap-1.5 sm:gap-3 py-1">
+                ${circleOptions.map(opt => {
+                  const isSelected = currentVal === opt.val;
+                  return `
+                    <button type="button"
+                      onclick="selectCircleAnswer(${q.id}, ${opt.val})"
+                      aria-label="評価 ${opt.val}"
+                      class="rounded-full border-2 flex items-center justify-center transition-all duration-150 cursor-pointer focus:outline-none ${opt.sizeCls} ${
+                        isSelected ? `${opt.activeCls} animate-pop` : `bg-white ${opt.ringCls}`
+                      }">
+                      ${isSelected ? '<span class="text-xs sm:text-sm font-black">✓</span>' : ''}
+                    </button>
+                  `;
+                }).join('')}
+              </div>
+
+              <!-- 両端ラベル（スマホでも見やすい） -->
+              <div class="flex items-center justify-between text-[11px] sm:text-xs font-extrabold mt-2 px-0.5">
+                <span class="text-rose-500">ちがう</span>
+                <span class="text-slate-400 font-bold">どっちとも言えない</span>
+                <span class="text-emerald-600">めっちゃわかる！</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('prev-step-btn').disabled = (step === 1);
+      const nextBtnText = document.getElementById('next-step-btn-text');
+      if (step === totalSteps) {
+        nextBtnText.textContent = '結果を見る！🎉';
+      } else {
+        nextBtnText.textContent = `次のページへ（${step + 1}/${totalSteps}）→`;
+      }
+    }
+
+    function selectCircleAnswer(questionId, value) {
+      state.answers[questionId] = value;
+      saveToStorage();
+      renderTestView();
+
+      // 同じページ内の次の未回答質問へスムーズにフォーカス移動＆軽くハイライト
+      const activeQuestions = getActiveQuestionList();
+      const startIdx = (state.currentStep - 1) * QUESTIONS_PER_PAGE;
+      const pageQuestions = activeQuestions.slice(startIdx, startIdx + QUESTIONS_PER_PAGE);
+      const currentIdx = pageQuestions.findIndex(q => q.id === questionId);
+
+      if (currentIdx >= 0) {
+        const nextUnanswered = pageQuestions.slice(currentIdx + 1).find(q => !state.answers[q.id])
+          || pageQuestions.find(q => !state.answers[q.id]);
+
+        if (nextUnanswered) {
+          requestAnimationFrame(() => {
+            const nextCard = document.getElementById(`q-card-${nextUnanswered.id}`);
+            if (nextCard) {
+              nextCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              nextCard.classList.add('border-orange-300', 'ring-4', 'ring-orange-100/80');
+              setTimeout(() => {
+                nextCard.classList.remove('border-orange-300', 'ring-4', 'ring-orange-100/80');
+              }, 850);
+            }
+          });
+        } else if (currentIdx === pageQuestions.length - 1) {
+          requestAnimationFrame(() => {
+            const nextBtn = document.getElementById('next-step-btn');
+            if (nextBtn) {
+              nextBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+          });
+        }
+      }
+    }
+
+    function prevStep() {
+      if (state.currentStep > 1) {
+        state.currentStep--;
+        renderTestView();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function nextStep() {
+      const activeQuestions = getActiveQuestionList();
+      const totalSteps = Math.ceil(activeQuestions.length / QUESTIONS_PER_PAGE);
+      const startIdx = (state.currentStep - 1) * QUESTIONS_PER_PAGE;
+      const pageQuestions = activeQuestions.slice(startIdx, startIdx + QUESTIONS_PER_PAGE);
+      const unanswered = pageQuestions.filter(q => !state.answers[q.id]);
+
+      if (unanswered.length > 0) {
+        unanswered.forEach(q => {
+          const card = document.getElementById(`q-card-${q.id}`);
+          if (card) {
+            card.classList.remove('border-slate-200/80');
+            card.classList.add('border-rose-400', 'ring-4', 'ring-rose-100');
+          }
+        });
+        const firstEl = document.getElementById(`q-card-${unanswered[0].id}`);
+        if (firstEl) {
+          firstEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        showToast(`まだ答えていない質問が ${unanswered.length} 問あるよ！（ピンクの枠をチェックしてね）`, 'warning');
+        return;
+      }
+
+      if (state.currentStep < totalSteps) {
+        state.currentStep++;
+        renderTestView();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        finishQuiz();
+      }
+    }
+
+    function resetCurrentAnswers() {
+      openConfirmModal(
+        '回答をリセットする？',
+        'いま選んでいる回答をすべて消して最初からやり直します。',
+        () => {
+          state.answers = {};
+          state.currentStep = 1;
+          saveToStorage();
+          renderTestView();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          showToast('回答をリセットしたよ！', 'info');
+        }
+      );
+    }
+
+    /**
+     * 10. 採点＆プロファイル生成（32問・64問どちらも28点満点スケールに統一）
+     */
+    function calculateScores(answersObj, courseLen) {
+      const scores = [];
+      for (let k = 1; k <= 16; k++) {
+        const q1 = Number(answersObj[k] || 4);
+        const q3 = 8 - Number(answersObj[k + 32] || 4); // 逆転項目
+        if (courseLen === 32) {
+          // 2問（正1＋逆1：2〜14点）を2倍して 4〜28点満点に揃える
+          scores.push((q1 + q3) * 2);
+        } else {
+          // 4問（正3＋逆1：4〜28点満点）
+          const q2 = Number(answersObj[k + 16] || 4);
+          const q4 = Number(answersObj[k + 48] || 4);
+          scores.push(q1 + q2 + q3 + q4);
+        }
+      }
+      return scores;
+    }
+
+    function buildMemberProfile(id, name, role, scores, courseLabel = 'じっくり64問コース') {
+      const ranked = STRENGTHS.map((s, idx) => ({
+        ...s,
+        score: scores[idx]
+      })).sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        return a.id - b.id;
+      });
+
+      const domainScores = { 1: 0, 2: 0, 3: 0, 4: 0 };
+      ranked.forEach(item => {
+        domainScores[item.domainId] += item.score;
+      });
+
+      let dominantDomainId = 1;
+      let maxVal = -1;
+      [1, 2, 3, 4].forEach(dId => {
+        if (domainScores[dId] > maxVal) {
+          maxVal = domainScores[dId];
+          dominantDomainId = dId;
+        }
+      });
+
+      const top4 = ranked.slice(0, 4);
+      const top1Catchphrase = top4[0]?.catchphrase || '自分の得意なスタイルでチームを動かすタイプ';
+
+      return {
+        id,
+        name: name || 'あなた',
+        role: role || 'Loopusメンバー',
+        courseLabel,
+        scores,
+        ranked,
+        top4,
+        catchphrase: top1Catchphrase,
+        domainScores,
+        dominantDomainId
+      };
+    }
+
+    function finishQuiz() {
+      const activeQuestions = getActiveQuestionList();
+      const missing = activeQuestions.filter(q => !state.answers[q.id]);
+      if (missing.length > 0) {
+        showToast(`まだ答えていない質問が ${missing.length} 問あるよ！`, 'warning');
+        return;
+      }
+
+      const nameVal = document.getElementById('user-name-input').value.trim() || 'あなた';
+      const roleVal = document.getElementById('user-role-input').value.trim() || 'Loopusメンバー';
+      state.userName = nameVal;
+      state.userRole = roleVal;
+
+      const scores = calculateScores(state.answers, state.courseLength);
+      const label = state.courseLength === 32 ? 'サクッと32問コース' : 'じっくり64問フルコース';
+      state.currentResult = buildMemberProfile('self-' + Date.now(), nameVal, roleVal, scores, label);
+      state.selectedTopTabIdx = 0;
+      saveToStorage();
+      updateStatusBadges();
+      showToast('診断おつかれさま！結果が完成したよ🎉', 'success');
+      switchTab('report');
+    }
+
+    /**
+     * 10秒体験用サンプル結果生成
+     */
+    function runDemoSample() {
+      const demoNames = ['ハルカ（サンプル）', 'レン（サンプル）', 'ミオ（サンプル）', 'ショウタ（サンプル）'];
+      const demoRoles = ['イベント企画・SNS担当', '渉外・協賛営業担当', 'コミュニティ・運営担当'];
+      const pickedName = state.userName || demoNames[Math.floor(Math.random() * demoNames.length)];
+      const pickedRole = state.userRole || demoRoles[Math.floor(Math.random() * demoRoles.length)];
+
+      const baseTendency = {};
+      for (let k = 1; k <= 16; k++) {
+        baseTendency[k] = Math.floor(Math.random() * 5) + 2;
+      }
+      const sampleAnswers = {};
+      QUESTIONS.forEach(q => {
+        const jitter = Math.floor(Math.random() * 3) - 1;
+        const val = Math.max(1, Math.min(7, baseTendency[q.strengthId] + jitter));
+        sampleAnswers[q.id] = q.isReverse ? (8 - val) : val;
+      });
+
+      state.answers = sampleAnswers;
+      const scores = calculateScores(sampleAnswers, 32);
+      state.currentResult = buildMemberProfile('demo-' + Date.now(), pickedName, pickedRole, scores, '体験サンプル');
+      state.selectedTopTabIdx = 0;
+      saveToStorage();
+      updateStatusBadges();
+      showToast('体験用のサンプル結果を表示したよ！✨', 'success');
+      switchTab('report');
+    }
+
+    function updateStatusBadges() {
+      const badge = document.getElementById('mobile-status-badge');
+      const dot = document.getElementById('report-ready-dot');
+      if (state.currentResult) {
+        badge.textContent = '診断OK!';
+        badge.className = 'md:hidden inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200';
+        dot.classList.remove('hidden');
+      } else {
+        badge.textContent = 'まだ診断前';
+        badge.className = 'md:hidden inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-600';
+        dot.classList.add('hidden');
+      }
+    }
+
+    /**
+     * 11. マイ結果（個人結果レポート）レンダリング
+     */
+    function setReportDetailMode(mode) {
+      state.detailMode = mode;
+      renderReport();
+    }
+
+    function selectTop4Tab(idx) {
+      state.selectedTopTabIdx = idx;
+      renderReport();
+    }
+
+    function renderReport() {
+      const profile = state.currentResult;
+      const emptyEl = document.getElementById('report-empty-state');
+      const contentEl = document.getElementById('report-content');
+
+      if (!profile) {
+        emptyEl.classList.remove('hidden');
+        contentEl.classList.add('hidden');
+        return;
+      }
+
+      emptyEl.classList.add('hidden');
+      contentEl.classList.remove('hidden');
+
+      const dom = DOMAINS[profile.dominantDomainId];
+      const bannerEl = document.getElementById('report-card-banner');
+      bannerEl.className = `bg-gradient-to-r ${dom.gradBg} p-5 sm:p-7 text-white`;
+
+      document.getElementById('report-dominant-type-badge').textContent = `${dom.emoji} ${dom.name}`;
+      document.getElementById('report-user-name').textContent = profile.name;
+      document.getElementById('report-catchphrase').textContent = `✨ ${profile.catchphrase || profile.top4[0].catchphrase}`;
+      document.getElementById('report-user-role').textContent = `担当・関わり：${profile.role}`;
+      document.getElementById('report-course-badge').textContent = profile.courseLabel || 'Loopus診断';
+
+      // ① スクショ映え Top 4 バッジカード
+      const pillsEl = document.getElementById('report-top4-pills');
+      pillsEl.innerHTML = profile.top4.map((s, idx) => {
+        const d = DOMAINS[s.domainId];
+        return `
+          <div class="rounded-2xl border-2 ${d.badgeBorder} ${d.badgeBg} p-4 flex flex-col justify-between transition-transform hover:-translate-y-0.5">
+            <div>
+              <div class="flex items-center justify-between gap-1 mb-1.5">
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full ${d.solidBg} text-white text-[11px] font-black">
+                  No.${idx + 1}
+                </span>
+                <span class="text-xs font-black text-slate-500">${s.score}<span class="text-[10px] font-normal">/28</span></span>
+              </div>
+              <div class="text-lg font-black text-slate-900 mt-1">${escapeHtml(s.name)}</div>
+            </div>
+            <div class="mt-2 pt-2 border-t border-black/5 text-[11px] font-bold ${d.accentText}">
+              ${d.emoji} ${d.shortName}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // ② TOP 4 トリセツ表示モードボタン制御
+      const tabModeBtn = document.getElementById('detail-mode-tab-btn');
+      const allModeBtn = document.getElementById('detail-mode-all-btn');
+      const tabsBar = document.getElementById('top4-detail-tabs');
+
+      if (state.detailMode === 'tab') {
+        tabModeBtn.className = 'px-3 py-1.5 rounded-xl text-xs font-extrabold bg-white text-slate-900 shadow-xs cursor-pointer';
+        allModeBtn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-800 cursor-pointer';
+        tabsBar.classList.remove('hidden');
+
+        tabsBar.innerHTML = profile.top4.map((s, idx) => {
+          const d = DOMAINS[s.domainId];
+          const isSelected = state.selectedTopTabIdx === idx;
+          return `
+            <button type="button" onclick="selectTop4Tab(${idx})"
+              class="p-2.5 rounded-2xl border text-left transition-all cursor-pointer ${
+                isSelected
+                  ? `${d.solidBg} text-white border-transparent shadow-xs`
+                  : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+              }">
+              <div class="text-[10px] font-extrabold ${isSelected ? 'text-white/85' : 'text-slate-400'}">TOP ${idx + 1}</div>
+              <div class="text-xs sm:text-sm font-black truncate">${escapeHtml(s.name)}</div>
+            </button>
+          `;
+        }).join('');
+      } else {
+        allModeBtn.className = 'px-3 py-1.5 rounded-xl text-xs font-extrabold bg-white text-slate-900 shadow-xs cursor-pointer';
+        tabModeBtn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-800 cursor-pointer';
+        tabsBar.classList.add('hidden');
+      }
+
+      // 表示するカードリスト決定
+      const cardsToShow = state.detailMode === 'tab'
+        ? [{ s: profile.top4[state.selectedTopTabIdx] || profile.top4[0], idx: state.selectedTopTabIdx }]
+        : profile.top4.map((s, idx) => ({ s, idx }));
+
+      const cardsEl = document.getElementById('report-top4-cards');
+      cardsEl.innerHTML = cardsToShow.map(({ s, idx }) => {
+        const d = DOMAINS[s.domainId];
+        return `
+          <article class="rounded-3xl border border-slate-200/90 border-l-8 ${d.borderLeft} bg-slate-50/40 p-5 sm:p-6 space-y-4 animate-fade-in">
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-200/70">
+              <div>
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="px-2.5 py-0.5 rounded-full ${d.solidBg} text-white text-xs font-black">
+                    TOP ${idx + 1}
+                  </span>
+                  <span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${d.badgeBg} ${d.badgeText} border ${d.badgeBorder}">
+                    ${d.emoji} ${d.name}
+                  </span>
+                </div>
+                <h4 class="text-xl sm:text-2xl font-black text-slate-900">${escapeHtml(s.name)}</h4>
+              </div>
+              <div class="px-3.5 py-1.5 rounded-2xl bg-white border border-slate-200 text-right">
+                <span class="text-lg font-black text-slate-900">${s.score}</span>
+                <span class="text-xs text-slate-400 font-bold">/28点</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs sm:text-sm">
+              <div class="bg-white rounded-2xl p-4 border border-slate-100">
+                <div class="text-xs font-black text-slate-500 mb-1">💡 どんなタイプ？</div>
+                <p class="text-slate-700 leading-relaxed">${escapeHtml(s.desc)}</p>
+              </div>
+
+              <div class="bg-white rounded-2xl p-4 border border-slate-100">
+                <div class="text-xs font-black text-slate-500 mb-1">🎪 Loopusでの活躍シーン</div>
+                <p class="text-slate-700 leading-relaxed">${escapeHtml(s.scene)}</p>
+              </div>
+
+              <div class="bg-emerald-50/70 rounded-2xl p-4 border border-emerald-100">
+                <div class="text-xs font-black text-emerald-700 mb-1">✨ うまく活かすコツ</div>
+                <p class="text-slate-700 leading-relaxed">${escapeHtml(s.goodUse)}</p>
+              </div>
+
+              <div class="bg-amber-50/80 rounded-2xl p-4 border border-amber-200/70">
+                <div class="text-xs font-black text-amber-800 mb-1">⚠️ やりすぎ注意！（空回りサイン）</div>
+                <p class="text-slate-700 leading-relaxed">${escapeHtml(s.overuse)}</p>
+              </div>
+
+              <div class="md:col-span-2 bg-violet-50/70 rounded-2xl p-4 border border-violet-100">
+                <div class="text-xs font-black text-violet-700 mb-1">🚀 もっと伸ばすプチアクション</div>
+                <p class="text-slate-700 leading-relaxed">${escapeHtml(s.recipe)}</p>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      // ③ 4タイプバランス（SVGレーダーチャート＆横バー）
+      renderRadarChart(profile.domainScores);
+
+      const domainBarsEl = document.getElementById('domain-bars-container');
+      domainBarsEl.innerHTML = [1, 2, 3, 4].map(dId => {
+        const d = DOMAINS[dId];
+        const rawScore = profile.domainScores[dId];
+        const pct = Math.round(((rawScore - 16) / (112 - 16)) * 100);
+        return `
+          <div>
+            <div class="flex items-center justify-between text-xs font-extrabold mb-1">
+              <span class="${d.accentText}">${d.emoji} ${d.name}</span>
+              <span class="text-slate-700">${pct}%</span>
+            </div>
+            <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+              <div class="h-full ${d.solidBg} rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // ④ 全16強みランキング
+      const rankingEl = document.getElementById('full-ranking-container');
+      rankingEl.innerHTML = profile.ranked.map((s, idx) => {
+        const d = DOMAINS[s.domainId];
+        const isTop4 = idx < 4;
+        const pct = Math.round(((s.score - 4) / 24) * 100);
+        return `
+          <div onclick="openStrengthModal(${s.id})"
+            class="group flex items-center gap-2.5 p-2 rounded-2xl hover:bg-slate-50 transition-all cursor-pointer">
+            <span class="w-7 text-center text-xs font-black ${isTop4 ? 'text-orange-500' : 'text-slate-400'}">
+              ${idx + 1}位
+            </span>
+            <div class="w-36 sm:w-44 flex-shrink-0 flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 ${d.solidBg}"></span>
+              <span class="text-xs sm:text-sm font-bold ${isTop4 ? 'text-slate-900' : 'text-slate-600'} group-hover:text-orange-600 truncate">
+                ${escapeHtml(s.name)}
+              </span>
+            </div>
+            <div class="flex-1 h-2.5 bg-slate-100 rounded-full overflow-hidden">
+              <div class="h-full ${isTop4 ? d.solidBg : 'bg-slate-300'} rounded-full" style="width: ${pct}%"></div>
+            </div>
+            <span class="w-11 text-right text-xs font-extrabold ${isTop4 ? 'text-slate-900' : 'text-slate-400'}">
+              ${s.score}<span class="text-[10px] font-normal">/28</span>
+            </span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderRadarChart(domainScores) {
+      const container = document.getElementById('radar-chart-container');
+      const size = 270;
+      const cx = size / 2;
+      const cy = size / 2;
+      const maxR = 82;
+
+      const norm = dId => {
+        const ratio = (domainScores[dId] - 16) / (112 - 16);
+        return Math.max(0.14, Math.min(1, ratio));
+      };
+
+      const v1 = norm(1); // 上：アイデア・巻き込み
+      const v2 = norm(2); // 右：コツコツ・現場支え
+      const v3 = norm(3); // 下：チーム・空気づくり
+      const v4 = norm(4); // 左：作戦・仕組みづくり
+
+      const p1 = `${cx},${cy - maxR * v1}`;
+      const p2 = `${cx + maxR * v2},${cy}`;
+      const p3 = `${cx},${cy + maxR * v3}`;
+      const p4 = `${cx - maxR * v4},${cy}`;
+
+      const grids = [0.25, 0.5, 0.75, 1.0].map(level => {
+        const r = maxR * level;
+        const pts = `${cx},${cy - r} ${cx + r},${cy} ${cx},${cy + r} ${cx - r},${cy}`;
+        return `<polygon points="${pts}" fill="none" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="${level < 1 ? '3 3' : '0'}" />`;
+      }).join('');
+
+      container.innerHTML = `
+        <svg viewBox="0 0 ${size} ${size}" class="w-full max-w-[280px] h-auto overflow-visible">
+          <defs>
+            <linearGradient id="studentRadarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#F97316" stop-opacity="0.32" />
+              <stop offset="100%" stop-color="#8B5CF6" stop-opacity="0.28" />
+            </linearGradient>
+          </defs>
+          ${grids}
+          <line x1="${cx}" y1="${cy - maxR}" x2="${cx}" y2="${cy + maxR}" stroke="#cbd5e1" stroke-width="1" />
+          <line x1="${cx - maxR}" y1="${cy}" x2="${cx + maxR}" y2="${cy}" stroke="#cbd5e1" stroke-width="1" />
+
+          <polygon points="${p1} ${p2} ${p3} ${p4}" fill="url(#studentRadarGrad)" stroke="#F97316" stroke-width="2.5" stroke-linejoin="round" />
+
+          <circle cx="${cx}" cy="${cy - maxR * v1}" r="5" fill="#F97316" stroke="#fff" stroke-width="1.5" />
+          <circle cx="${cx + maxR * v2}" cy="${cy}" r="5" fill="#4F46E5" stroke="#fff" stroke-width="1.5" />
+          <circle cx="${cx}" cy="${cy + maxR * v3}" r="5" fill="#10B981" stroke="#fff" stroke-width="1.5" />
+          <circle cx="${cx - maxR * v4}" cy="${cy}" r="5" fill="#8B5CF6" stroke="#fff" stroke-width="1.5" />
+
+          <text x="${cx}" y="${cy - maxR - 12}" text-anchor="middle" class="text-[11px] font-black fill-orange-600">🔥 動かす・広げる</text>
+          <text x="${cx + maxR + 8}" y="${cy + 4}" text-anchor="start" class="text-[11px] font-black fill-indigo-600">🛠️ 形にする・支える</text>
+          <text x="${cx}" y="${cy + maxR + 18}" text-anchor="middle" class="text-[11px] font-black fill-emerald-600">💬 つなぐ・空気づくり</text>
+          <text x="${cx - maxR - 8}" y="${cy + 4}" text-anchor="end" class="text-[11px] font-black fill-violet-600">🧭 先を読む・仕組み</text>
+        </svg>
+      `;
+    }
+
+    /**
+     * 12. LINE/Slackシェア＆チーム連携
+     */
+    function buildShareCodeString(p) {
+      const payload = {
+        n: p.name,
+        r: p.role,
+        s: p.scores
+      };
+      return 'LOOPUS-V1:' + btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+    }
+
+    function copyShareText() {
+      if (!state.currentResult) return;
+      const p = state.currentResult;
+      const lines = p.top4.map((s, i) => `  ${i + 1}位：${s.name}（${s.score}点）`).join('\n');
+      const code = buildShareCodeString(p);
+      const text = [
+        `✨【Loopus 強み・スタイル診断】✨`,
+        `名前：${p.name}（${p.role}）`,
+        `タイプ：${DOMAINS[p.dominantDomainId].emoji} ${DOMAINS[p.dominantDomainId].name}`,
+        `キャッチコピー：${p.catchphrase || p.top4[0].catchphrase}`,
+        ``,
+        `🏆 私のTOP 4 強み`,
+        lines,
+        ``,
+        `💡 うまく活かすコツ：`,
+        `「${p.top4[0].name}」→ ${p.top4[0].goodUse}`,
+        `⚠️ やりすぎ注意！（空回りサイン）：`,
+        `「${p.top4[0].name}」→ ${p.top4[0].overuse}`,
+        ``,
+        `🔗 10人マップ合体コード（このまま貼り付けOK）：`,
+        code
+      ].join('\n');
+
+      copyToClipboard(text, 'LINE / Slackにそのまま貼れる結果＋合体コードをコピーしたよ！📋');
+    }
+
+    function copyShareCode() {
+      if (!state.currentResult) return;
+      const code = buildShareCodeString(state.currentResult);
+      copyToClipboard(code, '10人マップ合体用コードをコピーしたよ！運営メンバーに送ってね🔗');
+    }
+
+    function addCurrentResultToTeam() {
+      if (!state.currentResult) return;
+      const idx = state.teamMembers.findIndex(m => m.name === state.currentResult.name);
+      if (idx >= 0) {
+        state.teamMembers[idx] = { ...state.currentResult };
+        showToast(`「${state.currentResult.name}」のデータを10人マップで更新したよ！`, 'success');
+      } else {
+        state.teamMembers.push({ ...state.currentResult });
+        showToast(`「${state.currentResult.name}」を10人マップ（いま${state.teamMembers.length}人）に追加したよ！🎉`, 'success');
+      }
+      saveToStorage();
+      switchTab('team');
+    }
+
+    /**
+     * 13. 10人マップ（チーム分析）レンダリング
+     */
+    function loadPresetTeam(notify = false) {
+      state.teamMembers = PRESET_TEAM_MEMBERS.map(m => buildMemberProfile(m.id, m.name, m.role, m.scores, 'プリセット'));
+      saveToStorage();
+      renderTeamAnalysis();
+      if (notify) {
+        showToast('初期のLoopus 10人データを読み込んだよ！', 'success');
+      }
+    }
+
+    function openImportModal() {
+      document.getElementById('import-code-textarea').value = '';
+      document.getElementById('import-code-modal').classList.remove('hidden');
+    }
+
+    function importMemberFromCode() {
+      const raw = document.getElementById('import-code-textarea').value.trim();
+      const match = raw.match(/LOOPUS-V1:[A-Za-z0-9+/=]+/);
+      if (!match) {
+        showToast('「LOOPUS-V1:...」を含むメッセージまたはコードを貼り付けてね！', 'warning');
+        return;
+      }
+      try {
+        const b64 = match[0].replace('LOOPUS-V1:', '');
+        const jsonStr = decodeURIComponent(escape(atob(b64)));
+        const parsed = JSON.parse(jsonStr);
+        if (!parsed.n || !Array.isArray(parsed.s) || parsed.s.length !== 16) {
+          throw new Error('Invalid');
+        }
+        const profile = buildMemberProfile('imp-' + Date.now(), parsed.n, parsed.r || 'Loopusメンバー', parsed.s, 'コード追加');
+        const idx = state.teamMembers.findIndex(m => m.name === profile.name);
+        if (idx >= 0) {
+          state.teamMembers[idx] = profile;
+        } else {
+          state.teamMembers.push(profile);
+        }
+        saveToStorage();
+        closeModal('import-code-modal');
+        renderTeamAnalysis();
+        showToast(`「${profile.name}」を10人マップに追加したよ！🎉`, 'success');
+      } catch (e) {
+        showToast('コードがうまく読み取れなかったよ。全部コピーできているか確認してね！', 'warning');
+      }
+    }
+
+    function removeTeamMember(memberId) {
+      state.teamMembers = state.teamMembers.filter(m => m.id !== memberId);
+      saveToStorage();
+      renderTeamAnalysis();
+      showToast('リストから削除したよ', 'info');
+    }
+
+    function confirmClearTeam() {
+      openConfirmModal(
+        'メンバー一覧を空にする？',
+        'いま表示されているメンバーを全員リストから消します。（「初期10人データに戻す」ボタンでいつでも戻せるよ！）',
+        () => {
+          state.teamMembers = [];
+          saveToStorage();
+          renderTeamAnalysis();
+          showToast('一覧をクリアしたよ', 'info');
+        }
+      );
+    }
+
+    function viewMemberReport(memberId) {
+      const member = state.teamMembers.find(m => m.id === memberId);
+      if (!member) return;
+      state.currentResult = member;
+      state.selectedTopTabIdx = 0;
+      updateStatusBadges();
+      switchTab('report');
+      showToast(`「${member.name}」のマイ結果を表示してるよ！`, 'info');
+    }
+
+    function renderTeamAnalysis() {
+      const members = state.teamMembers;
+      const count = members.length;
+      document.getElementById('team-count-badge').textContent = `いま ${count} 人`;
+
+      // 各強みの保有者マップ
+      const holderMap = {};
+      STRENGTHS.forEach(s => { holderMap[s.id] = []; });
+      const domainSlots = { 1: 0, 2: 0, 3: 0, 4: 0 };
+
+      members.forEach(m => {
+        m.top4.forEach(s => {
+          holderMap[s.id].push(m.name);
+          domainSlots[s.domainId]++;
+        });
+      });
+
+      // ① 活動テーマ別「役割フィットボード」
+      const roleFitEl = document.getElementById('role-fit-grid');
+      roleFitEl.innerHTML = ROLE_FIT_THEMES.map(theme => {
+        // このテーマの関連強みをTop4に持っているメンバーを抽出（合致数が多い順）
+        const matchedMembers = members.map(m => {
+          const matchedStrengthNames = m.top4
+            .filter(s => theme.strengthIds.includes(s.id))
+            .map(s => s.name);
+          return {
+            name: m.name,
+            count: matchedStrengthNames.length,
+            strengths: matchedStrengthNames
+          };
+        }).filter(item => item.count > 0)
+          .sort((a, b) => b.count - a.count);
+
+        const relatedStrengthLabels = theme.strengthIds
+          .map(id => STRENGTHS.find(s => s.id === id)?.name)
+          .filter(Boolean)
+          .join('・');
+
+        return `
+          <div class="rounded-2xl border border-slate-200/90 bg-slate-50/50 p-4 flex flex-col justify-between">
+            <div>
+              <div class="font-black text-sm text-slate-900">${theme.title}</div>
+              <p class="text-[11px] text-slate-500 mt-0.5">${theme.desc}</p>
+              <div class="mt-2.5 flex flex-wrap gap-1.5">
+                ${matchedMembers.length > 0
+                  ? matchedMembers.slice(0, 4).map(mm => `
+                      <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-extrabold border ${theme.badgeColor}">
+                        <span>${escapeHtml(mm.name)}</span>
+                        ${mm.count >= 2 ? '<span class="text-[10px]">★</span>' : ''}
+                      </span>
+                    `).join('')
+                  : '<span class="text-xs text-slate-400">まだメンバーがいません</span>'
+                }
+              </div>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-200/60 text-[10px] text-slate-400 font-bold">
+              活きる強み：${relatedStrengthLabels}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // ② 4タイプ割合
+      const totalSlots = Math.max(1, count * 4);
+      const distEl = document.getElementById('team-domain-distribution');
+      distEl.innerHTML = [1, 2, 3, 4].map(dId => {
+        const d = DOMAINS[dId];
+        const slots = domainSlots[dId];
+        const pct = count === 0 ? 0 : Math.round((slots / totalSlots) * 100);
+        return `
+          <div class="p-3 rounded-2xl border ${d.badgeBorder} ${d.badgeBg}">
+            <div class="flex items-center justify-between text-xs font-black mb-1.5">
+              <span class="${d.accentText}">${d.emoji} ${d.name}</span>
+              <span class="text-slate-900">${pct}% <span class="text-slate-500 font-bold">(${slots}枠)</span></span>
+            </div>
+            <div class="w-full h-2.5 bg-white rounded-full overflow-hidden">
+              <div class="h-full ${d.solidBg} rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // チームバランスひとことヒント
+      const tipEl = document.getElementById('team-balance-tip');
+      if (count === 0) {
+        tipEl.innerHTML = 'メンバーを追加すると、チーム全体のバランスアドバイスが表示されるよ！';
+      } else {
+        let minId = 1;
+        let maxId = 1;
+        [1, 2, 3, 4].forEach(dId => {
+          if (domainSlots[dId] < domainSlots[minId]) minId = dId;
+          if (domainSlots[dId] > domainSlots[maxId]) maxId = dId;
+        });
+        tipEl.innerHTML = `
+          💡 <strong>チームの傾向メモ：</strong><br>
+          今のLoopusは「<strong>${DOMAINS[maxId].name}</strong>」のエネルギーが一番たっぷり！一方で「<strong>${DOMAINS[minId].name}</strong>」は人数が少なめだから、その強みを持つメンバーの意見を大事にしたり、テンプレや仕組みで補い合うとさらに強くなるよ✨
+        `;
+      }
+
+      // ③ 16強み人数ヒートマップ
+      const heatmapEl = document.getElementById('team-heatmap-grid');
+      heatmapEl.innerHTML = STRENGTHS.map(s => {
+        const d = DOMAINS[s.domainId];
+        const holders = holderMap[s.id];
+        const hCount = holders.length;
+
+        let cardCls = 'bg-slate-50 border-slate-200';
+        let badgeCls = 'bg-slate-200 text-slate-600';
+        if (count > 0 && hCount === 0) {
+          cardCls = 'bg-rose-50/60 border-rose-200 border-dashed';
+          badgeCls = 'bg-rose-100 text-rose-600';
+        } else if (hCount >= 3) {
+          cardCls = 'bg-orange-50/70 border-orange-200';
+          badgeCls = 'bg-orange-500 text-white';
+        } else if (hCount >= 1) {
+          cardCls = 'bg-white border-slate-200';
+          badgeCls = 'bg-emerald-500 text-white';
+        }
+
+        return `
+          <div onclick="openStrengthModal(${s.id})"
+            class="p-3 rounded-2xl border ${cardCls} hover:shadow-xs transition-all cursor-pointer">
+            <div class="flex items-center justify-between gap-2 mb-1">
+              <div class="flex items-center gap-1.5 min-w-0">
+                <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 ${d.solidBg}"></span>
+                <span class="text-xs font-black text-slate-900 truncate">${escapeHtml(s.name)}</span>
+              </div>
+              <span class="px-2 py-0.5 rounded-full text-[11px] font-black flex-shrink-0 ${badgeCls}">
+                ${hCount}人
+              </span>
+            </div>
+            <div class="text-[11px] text-slate-500 truncate font-medium">
+              ${hCount > 0 ? holders.join('・') : 'まだ0人（仕組みでカバーしよう！）'}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // ④ メンバー一覧テーブル
+      const tbody = document.getElementById('team-roster-tbody');
+      if (count === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="py-8 text-center text-xs text-slate-400 font-bold">
+              まだメンバーが登録されていないよ
+            </td>
+          </tr>
+        `;
+      } else {
+        tbody.innerHTML = members.map(m => {
+          const dom = DOMAINS[m.dominantDomainId];
+          return `
+            <tr class="hover:bg-slate-50/80 transition-colors">
+              <td class="py-3.5 px-4 sm:px-6">
+                <button type="button" onclick="viewMemberReport('${m.id}')" class="text-left group cursor-pointer">
+                  <div class="font-black text-slate-900 group-hover:text-orange-600 transition-colors">
+                    ${escapeHtml(m.name)}
+                  </div>
+                  <div class="text-[11px] text-slate-400 font-medium">${escapeHtml(m.role)}</div>
+                </button>
+              </td>
+              <td class="py-3.5 px-3">
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold ${dom.badgeBg} ${dom.badgeText} border ${dom.badgeBorder} whitespace-nowrap">
+                  ${dom.emoji} ${dom.shortName}
+                </span>
+              </td>
+              ${m.top4.map(s => {
+                const sd = DOMAINS[s.domainId];
+                return `
+                  <td class="py-3.5 px-3">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold bg-slate-100/80 text-slate-800 whitespace-nowrap">
+                      <span class="w-2 h-2 rounded-full ${sd.solidBg}"></span>
+                      ${escapeHtml(s.name)}
+                    </span>
+                  </td>
+                `;
+              }).join('')}
+              <td class="py-3.5 px-4 text-right">
+                <button type="button" onclick="removeTeamMember('${m.id}')" title="削除"
+                  class="px-2.5 py-1 rounded-xl text-xs font-bold text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer">
+                  削除
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+
+    /**
+     * 14. 16強み図鑑レンダリング
+     */
+    function setEncyclopediaFilter(domainId) {
+      state.encyclopediaFilter = domainId;
+      renderEncyclopedia();
+    }
+
+    function renderEncyclopedia() {
+      const filterId = state.encyclopediaFilter;
+      const query = (document.getElementById('encyclopedia-search')?.value || '').trim().toLowerCase();
+
+      const filtersEl = document.getElementById('encyclopedia-filters');
+      const filterOptions = [
+        { id: 0, label: 'すべて (16)' },
+        { id: 1, label: '🔥 ゼロから動かす・外に広げる (4)' },
+        { id: 2, label: '🛠️ 形にする・現場を支える (4)' },
+        { id: 3, label: '💬 チームをつなぐ・空気をつくる (4)' },
+        { id: 4, label: '🧭 先を読む・仕組みを整える (4)' }
+      ];
+
+      filtersEl.innerHTML = filterOptions.map(opt => {
+        const active = filterId === opt.id;
+        return `
+          <button type="button" onclick="setEncyclopediaFilter(${opt.id})"
+            class="px-3.5 py-2 rounded-2xl text-xs font-extrabold transition-all cursor-pointer ${
+              active
+                ? 'bg-slate-900 text-white shadow-xs'
+                : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+            }">
+            ${opt.label}
+          </button>
+        `;
+      }).join('');
+
+      const filtered = STRENGTHS.filter(s => {
+        if (filterId !== 0 && s.domainId !== filterId) return false;
+        if (!query) return true;
+        const text = `${s.name} ${s.desc} ${s.scene} ${s.goodUse} ${s.overuse} ${s.recipe}`.toLowerCase();
+        return text.includes(query);
+      });
+
+      const gridEl = document.getElementById('encyclopedia-grid');
+      if (filtered.length === 0) {
+        gridEl.innerHTML = `
+          <div class="col-span-full bg-white rounded-3xl border border-slate-200 p-10 text-center text-sm text-slate-500 font-bold">
+            一致する強みが見つからなかったよ。別の言葉で検索してみてね！
+          </div>
+        `;
+        return;
+      }
+
+      gridEl.innerHTML = filtered.map(s => {
+        const d = DOMAINS[s.domainId];
+        return `
+          <article class="bg-white rounded-3xl border border-slate-200/80 border-l-8 ${d.borderLeft} shadow-soft p-5 sm:p-6 space-y-3">
+            <div class="pb-3 border-b border-slate-100">
+              <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-extrabold ${d.badgeBg} ${d.badgeText} border ${d.badgeBorder} mb-1.5">
+                ${d.emoji} ${d.name}
+              </span>
+              <h3 class="text-lg sm:text-xl font-black text-slate-900">
+                ${String(s.id).padStart(2, '0')}. ${escapeHtml(s.name)}
+              </h3>
+            </div>
+
+            <div class="space-y-2.5 text-xs sm:text-sm">
+              <div>
+                <div class="text-xs font-black text-slate-500 mb-0.5">💡 どんなタイプ？</div>
+                <p class="text-slate-700 leading-relaxed">${escapeHtml(s.desc)}</p>
+              </div>
+              <div class="bg-slate-50 rounded-2xl p-3">
+                <div class="text-xs font-black text-slate-600 mb-0.5">🎪 Loopusでの活躍シーン</div>
+                <p class="text-slate-700 leading-relaxed">${escapeHtml(s.scene)}</p>
+              </div>
+              <div class="bg-emerald-50/70 border border-emerald-100 rounded-2xl p-3">
+                <div class="text-xs font-black text-emerald-700 mb-0.5">✨ うまく活かすコツ</div>
+                <p class="text-slate-700 leading-relaxed">${escapeHtml(s.goodUse)}</p>
+              </div>
+              <div class="bg-amber-50/80 border border-amber-200/70 rounded-2xl p-3">
+                <div class="text-xs font-black text-amber-800 mb-0.5">⚠️ やりすぎ注意！（空回りサイン）</div>
+                <p class="text-slate-700 leading-relaxed">${escapeHtml(s.overuse)}</p>
+              </div>
+              <div class="bg-violet-50/70 border border-violet-100 rounded-2xl p-3">
+                <div class="text-xs font-black text-violet-700 mb-0.5">🚀 もっと伸ばすプチアクション</div>
+                <p class="text-slate-700 leading-relaxed">${escapeHtml(s.recipe)}</p>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    /**
+     * 15. モーダル＆便利関数（alert / confirm 不使用）
+     */
+    function openStrengthModal(strengthId) {
+      const s = STRENGTHS.find(item => item.id === strengthId);
+      if (!s) return;
+      const d = DOMAINS[s.domainId];
+
+      document.getElementById('modal-strength-header').innerHTML = `
+        <div>
+          <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-extrabold ${d.badgeBg} ${d.badgeText} border ${d.badgeBorder} mb-1">
+            ${d.emoji} ${d.name}
+          </span>
+          <h3 class="text-xl font-black text-slate-900">${escapeHtml(s.name)}</h3>
+        </div>
+      `;
+
+      document.getElementById('modal-strength-body').innerHTML = `
+        <div>
+          <div class="text-xs font-black text-slate-500 mb-0.5">💡 どんなタイプ？</div>
+          <p class="text-slate-700 leading-relaxed">${escapeHtml(s.desc)}</p>
+        </div>
+        <div class="bg-slate-50 rounded-2xl p-3">
+          <div class="text-xs font-black text-slate-600 mb-0.5">🎪 Loopusでの活躍シーン</div>
+          <p class="text-slate-700 leading-relaxed">${escapeHtml(s.scene)}</p>
+        </div>
+        <div class="bg-emerald-50/70 border border-emerald-100 rounded-2xl p-3">
+          <div class="text-xs font-black text-emerald-700 mb-0.5">✨ うまく活かすコツ</div>
+          <p class="text-slate-700 leading-relaxed">${escapeHtml(s.goodUse)}</p>
+        </div>
+        <div class="bg-amber-50/80 border border-amber-200/70 rounded-2xl p-3">
+          <div class="text-xs font-black text-amber-800 mb-0.5">⚠️ やりすぎ注意！（空回りサイン）</div>
+          <p class="text-slate-700 leading-relaxed">${escapeHtml(s.overuse)}</p>
+        </div>
+        <div class="bg-violet-50/70 border border-violet-100 rounded-2xl p-3">
+          <div class="text-xs font-black text-violet-700 mb-0.5">🚀 もっと伸ばすプチアクション</div>
+          <p class="text-slate-700 leading-relaxed">${escapeHtml(s.recipe)}</p>
+        </div>
+      `;
+
+      document.getElementById('strength-detail-modal').classList.remove('hidden');
+    }
+
+    function openConfirmModal(title, message, onConfirm) {
+      document.getElementById('confirm-modal-title').textContent = title;
+      document.getElementById('confirm-modal-message').textContent = message;
+      const okBtn = document.getElementById('confirm-modal-ok-btn');
+      okBtn.onclick = () => {
+        closeModal('custom-confirm-modal');
+        onConfirm();
+      };
+      document.getElementById('custom-confirm-modal').classList.remove('hidden');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.add('hidden');
+    }
+
+    function closeModalOnBackdrop(event, modalId) {
+      if (event.target.id === modalId) {
+        closeModal(modalId);
+      }
+    }
+
+    function copyToClipboard(text, successMsg) {
+      try {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast(successMsg, 'success');
+      } catch (e) {
+        showToast('コピーに失敗したよ。手動で選択してコピーしてね！', 'warning');
+      }
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      let bgCls = 'bg-slate-900 text-white border-slate-700';
+      if (type === 'success') bgCls = 'bg-emerald-600 text-white border-emerald-500';
+      if (type === 'warning') bgCls = 'bg-rose-600 text-white border-rose-500';
+
+      toast.className = `pointer-events-auto px-4 py-3 rounded-2xl border shadow-lg text-xs sm:text-sm font-extrabold animate-fade-in ${bgCls}`;
+      toast.textContent = message;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 3200);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    window.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>
